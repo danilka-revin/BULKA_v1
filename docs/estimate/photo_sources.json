@@ -7,6 +7,10 @@
     "url": "https://aliexpress.us/item/3256805820281283.html",
     "title": "ZS-X11H 400W 3 Phase Brushless Motor Speed Controller, 6–60 V (AliExpress)"
   },
+  "c930e.jpg": {
+    "url": "https://www.walmart.com/ip/Logitech-C930e-USB-2-0-HD-Webcam-1920-x-1080-Video-with-Auto-focus-960-000971/24727514",
+    "title": "Logitech C930e HD Webcam, 1080p (Walmart)"
+  },
   "carrier_sensor.jpg": {
     "repo": "pcb/images/sensor_module_render.png"
   },
@@ -17,6 +21,22 @@
     "url": "https://www.daraz.lk/products/gy-87-10dof-module-mpu6050-hmc5883l-bmp180-gy87-sensor-module-3v-5v-gy87-for-arduino-power-high-accurancy-i244301019.html",
     "title": "GY-87 10DOF Module MPU6050 HMC5883L BMP180 (daraz.lk)"
   },
+  "headlight.jpg": {
+    "url": "https://www.amazon.com/Willpower-Tractor-Driving-Waterproof-12-24V/dp/B01MDUY1I3",
+    "title": "18W LED Work Light, 12–24 V (Amazon)"
+  },
+  "kinect360.jpg": {
+    "url": "https://www.powerupgaming.ca/products/360-acc-kinsnsblk",
+    "title": "Kinect Sensor for Xbox 360, Black (powerupgaming.ca)"
+  },
+  "kinect_adapter.jpg": {
+    "url": "https://www.amazon.com/Power-Adapter-Supply-Cord-Cable-Kinect/dp/B01M0T5NJD",
+    "title": "Xbox 360 Kinect Adapter for PC with USB AC Power Supply (Amazon)"
+  },
+  "lds01.jpg": {
+    "url": "https://www.robot-advance.com/EN/art-360-laser-distance-sensor-lds-01-2352.htm",
+    "title": "360 Laser Distance Sensor LDS-01 (robot-advance.com)"
+  },
   "level_shifter.jpg": {
     "url": "https://rajivelectronics.com/product/i2c-4-channel-3-3v-to-5v-bi-directional-logic-level-converter/",
     "title": "4 Channel 3.3V to 5V Bi-Directional Logic Level Converter (rajivelectronics.com)"
@@ -26,6 +46,14 @@
   },
   "mega2560.jpg": {
     "repo": "docs/assets/images/arduino_mega_pro.jpg"
+  },
+  "mifare_card.jpg": {
+    "url": "https://ebay.com/itm/266858585451",
+    "title": "MIFARE Classic 1K RFID Smart Card, blank (eBay)"
+  },
+  "mini_pc.jpg": {
+    "url": "https://www.amazon.com/intel-n100-mini-pc/s?k=intel+n100+mini+pc",
+    "title": "Beelink Mini S12, Intel N100, 16 GB, 500 GB SSD (Amazon)"
   },
   "nema23.jpg": {
     "repo": "docs/assets/images/nema23_motor.jpg"
@@ -50,11 +78,23 @@
     "url": "https://robocomp.in/product/4-channel-5v-relay-module-with-optocoupler/",
     "title": "4 Channel 5V Relay Module with Optocoupler (robocomp.in)"
   },
+  "servo_mg996r.jpg": {
+    "url": "https://bluepacknova.com/product/servo-motor-mg996r%EF%BC%88metal-gear%EF%BC%89/",
+    "title": "MG996R Metal Gear High Torque Servo Motor (bluepacknova.com)"
+  },
+  "stop_light.jpg": {
+    "url": "https://thetrailershoppe.com/product/4-round-red-stop-turn-tail-light-24-led",
+    "title": "4-inch Round Red Stop, Turn, Tail Light, 24 LED (thetrailershoppe.com)"
+  },
   "subaru_hub.jpg": {
     "repo": "docs/assets/images/subaru_hub_bearing.jpg"
   },
   "tb6600.jpg": {
     "repo": "docs/assets/images/tb6600_driver.jpg"
+  },
+  "turn_signal.jpg": {
+    "url": "https://us.amazon.com/gp/new-releases/automotive/404801011",
+    "title": "Universal 12V LED Motorcycle Turn Signals, Amber, Pair (Amazon)"
   },
   "usb_ab.jpg": {
     "url": "https://tinkersphere.com/cables-wires/143-usb-a-to-b-cable-arduino-usb-cable.html",
