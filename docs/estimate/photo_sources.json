@@ -1,0 +1,78 @@
+{
+  "belt_gt2.jpg": {
+    "url": "https://aliexpress.us/w/wholesale-gt2-10mm-closed-loop-timing-belt.html",
+    "title": "GT2 6mm/10mm Closed Loop Rubber Timing Belt (AliExpress)"
+  },
+  "bldc_driver.jpg": {
+    "url": "https://aliexpress.us/item/3256805820281283.html",
+    "title": "ZS-X11H 400W 3 Phase Brushless Motor Speed Controller, 6–60 V (AliExpress)"
+  },
+  "carrier_sensor.jpg": {
+    "repo": "pcb/images/sensor_module_render.png"
+  },
+  "carrier_wheel.jpg": {
+    "repo": "pcb/images/wheel_module_render.png"
+  },
+  "gy87.jpg": {
+    "url": "https://www.daraz.lk/products/gy-87-10dof-module-mpu6050-hmc5883l-bmp180-gy87-sensor-module-3v-5v-gy87-for-arduino-power-high-accurancy-i244301019.html",
+    "title": "GY-87 10DOF Module MPU6050 HMC5883L BMP180 (daraz.lk)"
+  },
+  "level_shifter.jpg": {
+    "url": "https://rajivelectronics.com/product/i2c-4-channel-3-3v-to-5v-bi-directional-logic-level-converter/",
+    "title": "4 Channel 3.3V to 5V Bi-Directional Logic Level Converter (rajivelectronics.com)"
+  },
+  "lifepo4_32700.jpg": {
+    "repo": "docs/assets/images/lifepo4_32700.png"
+  },
+  "mega2560.jpg": {
+    "repo": "docs/assets/images/arduino_mega_pro.jpg"
+  },
+  "nema23.jpg": {
+    "repo": "docs/assets/images/nema23_motor.jpg"
+  },
+  "opto_endstop.jpg": {
+    "url": "https://www.ebay.com/p/881541659",
+    "title": "TCST2103 Optical Endstop Switch for RepRap 3D printer (eBay)"
+  },
+  "pot_10k.jpg": {
+    "url": "https://www.phippselectronics.com/product/10k-ohm-potentiometer-wh148-b10k-pack-of-2/",
+    "title": "10K Ohm Linear Potentiometer WH148 B10K (phippselectronics.com)"
+  },
+  "pulley_gt2_20.jpg": {
+    "url": "https://www.amazon.com/gt2-pulley-8mm/s?k=gt2+pulley+8mm",
+    "title": "GT2 Pulley 20 Teeth 8mm Bore Fit 10mm Belt Width (Amazon)"
+  },
+  "rc522.jpg": {
+    "url": "https://en.uraltone.com/rfid-rc522-1356mhz-key-fob-card-mkh-005.html",
+    "title": "RFID-RC522 13.56MHz with Key Fob and Card (uraltone.com)"
+  },
+  "relay4.jpg": {
+    "url": "https://robocomp.in/product/4-channel-5v-relay-module-with-optocoupler/",
+    "title": "4 Channel 5V Relay Module with Optocoupler (robocomp.in)"
+  },
+  "subaru_hub.jpg": {
+    "repo": "docs/assets/images/subaru_hub_bearing.jpg"
+  },
+  "tb6600.jpg": {
+    "repo": "docs/assets/images/tb6600_driver.jpg"
+  },
+  "usb_ab.jpg": {
+    "url": "https://tinkersphere.com/cables-wires/143-usb-a-to-b-cable-arduino-usb-cable.html",
+    "title": "USB A to B Cable, Arduino USB Cable (tinkersphere.com)"
+  },
+  "wheel_hub_motor.jpg": {
+    "repo": "docs/assets/images/scooter_hub_motor.jpg"
+  },
+  "ws2812b.jpg": {
+    "url": "https://vishaworld.com/products/ws2812b-addressable-rgb-led-strip-5v-60-leds-meter-inbuilt-chip-black-pcb-ip20-non-waterproof-1-meter",
+    "title": "WS2812B Addressable RGB LED Strip, 5V, 60 LEDs per meter (vishaworld.com)"
+  },
+  "xl4015.jpg": {
+    "url": "https://eleberric.com/product/xl4015-5a-buck-converter-module/",
+    "title": "XL4015 5A Buck Converter (eleberric.com)"
+  },
+  "xt60.jpg": {
+    "url": "https://www.robotgear.com.au/Product.aspx/Details/4183-XT60-Connector-Male-Female-Pair-Yellow",
+    "title": "Yellow XT60 connector male-female pair (robotgear.com.au)"
+  }
+}
