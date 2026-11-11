@@ -1,4 +1,8 @@
 {
+  "battery_box.jpg": {
+    "url": "https://ebay.ca/itm/173637225434",
+    "title": "36V 48V Empty Ebike battery box, lithium battery case (eBay)"
+  },
   "belt_gt2.jpg": {
     "url": "https://aliexpress.us/w/wholesale-gt2-10mm-closed-loop-timing-belt.html",
     "title": "GT2 6mm/10mm Closed Loop Rubber Timing Belt (AliExpress)"
@@ -6,6 +10,10 @@
   "bldc_driver.jpg": {
     "url": "https://aliexpress.us/item/3256805820281283.html",
     "title": "ZS-X11H 400W 3 Phase Brushless Motor Speed Controller, 6–60 V (AliExpress)"
+  },
+  "bms_12s.jpg": {
+    "url": "https://www.amazon.com/DALY-Lifepo4-Battery-Protection-Electronic/dp/B0B4JWSQG5",
+    "title": "DALY 12S 36V LiFePO4 BMS 60A (Amazon)"
   },
   "c930e.jpg": {
     "url": "https://www.walmart.com/ip/Logitech-C930e-USB-2-0-HD-Webcam-1920-x-1080-Video-with-Auto-focus-960-000971/24727514",
@@ -17,13 +25,33 @@
   "carrier_wheel.jpg": {
     "repo": "pcb/images/wheel_module_render.png"
   },
+  "charger_12s.jpg": {
+    "url": "https://amazon.com/clp/B0GCZW9M6X",
+    "title": "43.8V LiFePO4 Battery Charger for 12S 36V batteries (Amazon)"
+  },
+  "cp2102.jpg": {
+    "url": "https://www.phippselectronics.com/product/cp2102-usb-to-ttl-uart-serial-converter-module-with-jumper-wires/",
+    "title": "CP2102 USB to TTL UART Serial Converter Module (phippselectronics.com)"
+  },
+  "display_10.jpg": {
+    "url": "https://www.amazon.com/Waveshare-Capacitive-1280x800-Hardware-Resolution/dp/B01M7RRBUT",
+    "title": "Waveshare 10.1 inch Capacitive Touch Screen LCD, IPS, 1280x800 (Amazon)"
+  },
   "gy87.jpg": {
     "url": "https://www.daraz.lk/products/gy-87-10dof-module-mpu6050-hmc5883l-bmp180-gy87-sensor-module-3v-5v-gy87-for-arduino-power-high-accurancy-i244301019.html",
     "title": "GY-87 10DOF Module MPU6050 HMC5883L BMP180 (daraz.lk)"
   },
+  "hdmi_cable.jpg": {
+    "url": "https://www.ebay.com/itm/224267752976",
+    "title": "HDMI cable, High Speed, 1 m (eBay)"
+  },
   "headlight.jpg": {
     "url": "https://www.amazon.com/Willpower-Tractor-Driving-Waterproof-12-24V/dp/B01MDUY1I3",
     "title": "18W LED Work Light, 12–24 V (Amazon)"
+  },
+  "holder_32700.jpg": {
+    "url": "https://www.amazon.in/32700-battery-holder/s?k=32700+battery+holder",
+    "title": "Battery Spacer Holders 32650/32700 LiFePO4 Cell (Amazon)"
   },
   "kinect360.jpg": {
     "url": "https://www.powerupgaming.ca/products/360-acc-kinsnsblk",
@@ -57,6 +85,10 @@
   },
   "nema23.jpg": {
     "repo": "docs/assets/images/nema23_motor.jpg"
+  },
+  "nickel_strip.jpg": {
+    "url": "https://ebay.com/itm/147566642997",
+    "title": "Pure nickel strip 0.2 x 10 mm for battery spot welding (eBay)"
   },
   "opto_endstop.jpg": {
     "url": "https://www.ebay.com/p/881541659",
@@ -92,6 +124,10 @@
   "tb6600.jpg": {
     "repo": "docs/assets/images/tb6600_driver.jpg"
   },
+  "thermal_printer.jpg": {
+    "url": "https://www.alibaba.com/product-detail/CSN-A2-2-Inch-58mm-Thermal_1600948480312.html",
+    "title": "CSN-A2 58mm Thermal Embedded Kiosk Printer, TTL/RS232 (Alibaba)"
+  },
   "turn_signal.jpg": {
     "url": "https://us.amazon.com/gp/new-releases/automotive/404801011",
     "title": "Universal 12V LED Motorcycle Turn Signals, Amber, Pair (Amazon)"
@@ -99,6 +135,10 @@
   "usb_ab.jpg": {
     "url": "https://tinkersphere.com/cables-wires/143-usb-a-to-b-cable-arduino-usb-cable.html",
     "title": "USB A to B Cable, Arduino USB Cable (tinkersphere.com)"
+  },
+  "usb_hub.jpg": {
+    "url": "https://bciimage.com/product/7-port-usb-3-0-hub-with-individual-power-switch-power-adapter/",
+    "title": "7-Port USB 3.0 Hub with Individual Power Switch and Power Adapter (bciimage.com)"
   },
   "wheel_hub_motor.jpg": {
     "repo": "docs/assets/images/scooter_hub_motor.jpg"
