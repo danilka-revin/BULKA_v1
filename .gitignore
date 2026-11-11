@@ -39,6 +39,7 @@ var/firmware-flash.log
 *.hex
 *.elf
 firmware/firmware_sim/sim
+firmware/firmware_sim/sensor_sim
 
 # Виртуальные окружения и локальные сборки
 .venv/
