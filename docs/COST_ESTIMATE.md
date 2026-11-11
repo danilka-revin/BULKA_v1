@@ -505,7 +505,7 @@
 
 | Файл | Позиции | Источник |
 | :--- | :--- | :--- |
-| `wheel_hub_motor.jpg` | 1.01 | файл репозитория [`docs/assets/images/scooter_hub_motor.jpg`](../docs/assets/images/scooter_hub_motor.jpg) |
+| `wheel_hub_motor.jpg` | 1.01 | [36V 350W Scooter Hub Motor for Xiaomi M365 Pro, 8.5 inch, solid tyre (Amazon)](https://www.amazon.com/xiaomi-m365-pro-wheel-motor/s?k=xiaomi+m365+pro+wheel+motor) |
 | `subaru_hub.jpg` | 1.02 | файл репозитория [`docs/assets/images/subaru_hub_bearing.jpg`](../docs/assets/images/subaru_hub_bearing.jpg) |
 | `nema23.jpg` | 1.03 | файл репозитория [`docs/assets/images/nema23_motor.jpg`](../docs/assets/images/nema23_motor.jpg) |
 | `tb6600.jpg` | 1.04 | файл репозитория [`docs/assets/images/tb6600_driver.jpg`](../docs/assets/images/tb6600_driver.jpg) |
@@ -528,7 +528,7 @@
 | `headlight.jpg` | 2.08 | [18W LED Work Light, 12–24 V (Amazon)](https://www.amazon.com/Willpower-Tractor-Driving-Waterproof-12-24V/dp/B01MDUY1I3) |
 | `stop_light.jpg` | 2.09 | [4-inch Round Red Stop, Turn, Tail Light, 24 LED (thetrailershoppe.com)](https://thetrailershoppe.com/product/4-round-red-stop-turn-tail-light-24-led) |
 | `turn_signal.jpg` | 2.10 | [Universal 12V LED Motorcycle Turn Signals, Amber, Pair (Amazon)](https://us.amazon.com/gp/new-releases/automotive/404801011) |
-| `mifare_card.jpg` | 2.11 | [MIFARE Classic 1K RFID Smart Card, blank (eBay)](https://ebay.com/itm/266858585451) |
+| `mifare_card.jpg` | 2.11 | [Blank PVC cards, 13.56 MHz MIFARE Classic 1K (eBay)](https://www.ebay.com/itm/198487082417) |
 | `carrier_sensor.jpg` | 2.13 | файл репозитория [`pcb/images/sensor_module_render.png`](../pcb/images/sensor_module_render.png) |
 | `lds01.jpg` | 3.01 | [360 Laser Distance Sensor LDS-01 (robot-advance.com)](https://www.robot-advance.com/EN/art-360-laser-distance-sensor-lds-01-2352.htm) |
 | `kinect360.jpg` | 3.02 | [Kinect Sensor for Xbox 360, Black (powerupgaming.ca)](https://www.powerupgaming.ca/products/360-acc-kinsnsblk) |
@@ -546,7 +546,7 @@
 | `nickel_strip.jpg` | 5.04 | [Pure nickel strip 0.2 x 10 mm for battery spot welding (eBay)](https://ebay.com/itm/147566642997) |
 | `battery_box.jpg` | 5.05 | [36V 48V Empty Ebike battery box, lithium battery case (eBay)](https://ebay.ca/itm/173637225434) |
 | `charger_12s.jpg` | 5.06 | [43.8V LiFePO4 Battery Charger for 12S 36V batteries (Amazon)](https://amazon.com/clp/B0GCZW9M6X) |
-| `dcdc_24v.jpg` | 5.07 | [Mean Well RSD-200C-24 DC-DC Converter, 24 V, 8.4 A — изделие того же типа (powersupplymall.com)](https://powersupplymall.com/products/mean-well-rsd-200c-24-dc-dc-converter-201-6w-33-6-62-4v-in-24v-out) |
+| `dcdc_24v.jpg` | 5.07 | [Mean Well SD-200C-24 DC-DC Converter, 36–72 V in, 24 V out, 8.4 A (wellforces.com)](https://wellforces.com/products/mean-well-sd-200c-24-dc-dc-converter-200w-36-72v-in-24v-out) |
 | `dcdc_12v.jpg` | 5.08 | [Step-down DC-DC converter in aluminum case (eBay)](https://ebay.com/itm/135499151713) |
 | `dcdc_5v.jpg` | 5.09 | [5V 10A Step Down DC/DC 50W Power Converter, waterproof — изделие того же типа (madhornets.com)](https://www.madhornets.com/12-24v-to-5v-10a-step-down-dc-dc-50w-power-converter-regulator-waterproof/) |
 | `xt90s.jpg` | 5.10 | [Amass XT90-S Anti-Spark Connectors, 1 pair (phaserfpv.com.au)](https://phaserfpv.com.au/products/xt90-s-anti-spark-connectors) |
@@ -555,7 +555,7 @@
 | `terminals.jpg` | 5.13 | [Набор обжимных клемм с изоляцией в пластиковом кейсе (Яндекс Маркет)](https://market.yandex.ru/search?text=%D0%9D%D0%B0%D0%B1%D0%BE%D1%80+%D0%BE%D0%B1%D0%B6%D0%B8%D0%BC%D0%BD%D1%8B%D1%85+%D0%BA%D0%BB%D0%B5%D0%BC%D0%BC+%D1%81+%D0%B8%D0%B7%D0%BE%D0%BB%D1%8F%D1%86%D0%B8%D0%B5%D0%B9+%D0%B2+%D0%BF%D0%BB%D0%B0%D1%81%D1%82%D0%B8%D0%BA%D0%BE%D0%B2%D0%BE%D0%BC+%D0%BA%D0%B5%D0%B9%D1%81%D0%B5) |
 | `estop_switch.jpg` | 6.01 | [ED250 Emergency Stop, red mushroom head (Amazon)](https://amazon.ca/Emergency-Mushroom-Button-Switches-Control/dp/B0FPWZNNB3) |
 | `dc_breaker.jpg` | 6.02 | [CHINT NB1-63DC C63A 2P (chintglobal.com)](https://www.chintglobal.com/global/en/products/low-voltage/iec/final-power-distribution/nb1-63dc.html) |
-| `maxi_fuse.jpg` | 6.03 | [MAXI blade fuse holder with fuse (eBay)](https://www.ebay.com.au/itm/316067796755) |
+| `maxi_fuse.jpg` | 6.03 | [Waterproof MAXI inline fuse holder with fuses (eBay)](https://ebay.com/itm/407213114869) |
 | `beacon.jpg` | 6.04 | [12-24V Amber LED Strobe Light, magnetic (Amazon)](https://www.amazon.com/Magnetic-Rechargeable-Waterproof-Portable-Emergency/dp/B0F1MR1JSG) |
 | `buzzer.jpg` | 6.05 | [Оповещатель звуковой Зуммер-1-05 2ТК-12, 85 дБ, 12 В (rs24.ru)](https://rs24.ru/product/2359625) |
 | `reflective_tape.jpg` | 6.06 | [Reflective tape 50 mm, red/white, vehicle conspicuity (fowkes.co.za)](https://www.fowkes.co.za/product/tape-reflective-50mm-x-50m-red-50m-roll-vehicle-conspicuity-e-mark) |

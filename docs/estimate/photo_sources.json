@@ -54,8 +54,8 @@
     "title": "Step-down DC-DC converter in aluminum case (eBay)"
   },
   "dcdc_24v.jpg": {
-    "url": "https://powersupplymall.com/products/mean-well-rsd-200c-24-dc-dc-converter-201-6w-33-6-62-4v-in-24v-out",
-    "title": "Mean Well RSD-200C-24 DC-DC Converter, 24 V, 8.4 A — изделие того же типа (powersupplymall.com)"
+    "url": "https://wellforces.com/products/mean-well-sd-200c-24-dc-dc-converter-200w-36-72v-in-24v-out",
+    "title": "Mean Well SD-200C-24 DC-DC Converter, 36–72 V in, 24 V out, 8.4 A (wellforces.com)"
   },
   "dcdc_5v.jpg": {
     "url": "https://www.madhornets.com/12-24v-to-5v-10a-step-down-dc-dc-50w-power-converter-regulator-waterproof/",
@@ -109,15 +109,15 @@
     "repo": "docs/assets/images/lifepo4_32700.png"
   },
   "maxi_fuse.jpg": {
-    "url": "https://www.ebay.com.au/itm/316067796755",
-    "title": "MAXI blade fuse holder with fuse (eBay)"
+    "url": "https://ebay.com/itm/407213114869",
+    "title": "Waterproof MAXI inline fuse holder with fuses (eBay)"
   },
   "mega2560.jpg": {
     "repo": "docs/assets/images/arduino_mega_pro.jpg"
   },
   "mifare_card.jpg": {
-    "url": "https://ebay.com/itm/266858585451",
-    "title": "MIFARE Classic 1K RFID Smart Card, blank (eBay)"
+    "url": "https://www.ebay.com/itm/198487082417",
+    "title": "Blank PVC cards, 13.56 MHz MIFARE Classic 1K (eBay)"
   },
   "mini_pc.jpg": {
     "url": "https://www.amazon.com/intel-n100-mini-pc/s?k=intel+n100+mini+pc",
@@ -209,7 +209,8 @@
     "title": "7-Port USB 3.0 Hub with Individual Power Switch and Power Adapter (bciimage.com)"
   },
   "wheel_hub_motor.jpg": {
-    "repo": "docs/assets/images/scooter_hub_motor.jpg"
+    "url": "https://www.amazon.com/xiaomi-m365-pro-wheel-motor/s?k=xiaomi+m365+pro+wheel+motor",
+    "title": "36V 350W Scooter Hub Motor for Xiaomi M365 Pro, 8.5 inch, solid tyre (Amazon)"
   },
   "wire_8awg.jpg": {
     "url": "https://amazon.com/Wire%EF%BC%88Red-Electrical-Flexible-Temperature-Resistant/dp/B0DK57SLHZ",
