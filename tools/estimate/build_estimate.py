@@ -89,6 +89,21 @@ def fmt_qty(value: Decimal) -> str:
     return text.replace(".", ",")
 
 
+UNIT_FORMS = {
+    "пара": ("пара", "пары", "пар"),
+    "лист": ("лист", "листа", "листов"),
+    "банка": ("банка", "банки", "банок"),
+}
+
+
+def fmt_amount(quantity: Decimal, unit: str) -> str:
+    """«4 пары», «0,5 м²», «36 шт.»: количество с единицей в нужной форме."""
+    forms = UNIT_FORMS.get(unit)
+    if forms and quantity == quantity.to_integral_value():
+        unit = plural(int(quantity), *forms)
+    return f"{fmt_qty(quantity)}{NBSP}{unit}"
+
+
 def median(values):
     ordered = sorted(values)
     mid = len(ordered) // 2
@@ -523,7 +538,7 @@ def render_markdown(result: dict) -> str:
             )
             add(
                 f"| {row['id']} | {_photo(row)} | {name} "
-                f"| {fmt_qty(row['quantity'])}{NBSP}{row['unit']} | {fmt(row['unit_price'])} "
+                f"| {fmt_amount(row['quantity'], row['unit'])} | {fmt(row['unit_price'])} "
                 f"| {fmt(row['total'])} | {fmt(row['total_usd'])} | {_price_source(row)} |"
             )
         add(
@@ -609,14 +624,14 @@ def render_markdown(result: dict) -> str:
         "Ниже позиции новой сметы разложены по тем же статьям."
     )
     add("")
-    add("| Статья прежней калькуляции | Было, ₽ | Стало, ₽ | Разница, ₽ | Что изменилось |")
+    add("| Статья прежней калькуляции | Было, ₽ | Стало, ₽ | Разница, ₽ | Что в неё входит теперь |")
     add("| :--- | ---: | ---: | ---: | :--- |")
     for group in result["groups"]:
         delta = group["delta"]
         sign = "+" if delta >= 0 else ""
         add(
             f"| {group['name']} | {fmt(group['was'], 0)} | {fmt(group['now'])} "
-            f"| {sign}{fmt(delta)} | {group['change']} |"
+            f"| {sign}{fmt(delta)} | {group['content']} |"
         )
     delta_parts = result["parts_total"] - result["previous_parts"]
     add(
@@ -625,7 +640,7 @@ def render_markdown(result: dict) -> str:
     )
     add(
         f"| Работа, амортизация, интеграция | {fmt(result['other_total'], 0)} "
-        f"| {fmt(result['other_total'])} | 0,00 | не пересчитывались |"
+        f"| {fmt(result['other_total'])} | 0,00 | перенесены без пересчёта |"
     )
     delta_total = result["grand_total"] - result["previous_total"]
     add(
@@ -635,10 +650,11 @@ def render_markdown(result: dict) -> str:
     add("")
     ratio = result["grand_total"] / result["previous_total"]
     add(
-        f"Новый итог больше прежнего в {fmt(ratio, 2)} раза. Причина в составе, а не в росте "
-        "цен: прежняя калькуляция не учитывала модуль датчиков со светом и замком, три "
+        f"Новый итог больше прежнего в {fmt(ratio, 2)} раза. Основная часть разницы — позиции, "
+        "которых в прежней калькуляции не было: модуль датчиков со светом и замком, три "
         "камеры из четырёх, сенсор глубины, дисплей, принтер, зарядное устройство, "
-        "преобразователи напряжения и аварийный выключатель."
+        "преобразователи напряжения и аварийный выключатель. Лидар и компьютер в прежней "
+        "калькуляции были, но оценены ниже найденных сейчас цен."
     )
     add("")
     add("---")
