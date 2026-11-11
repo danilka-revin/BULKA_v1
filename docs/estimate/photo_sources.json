@@ -1,7 +1,15 @@
 {
+  "acp_3mm.jpg": {
+    "url": "https://plasticsheetsshop.co.uk/aluminium-composite-panels/white",
+    "title": "ACP white aluminium composite panel (plasticsheetsshop.co.uk)"
+  },
   "battery_box.jpg": {
     "url": "https://ebay.ca/itm/173637225434",
     "title": "36V 48V Empty Ebike battery box, lithium battery case (eBay)"
+  },
+  "beacon.jpg": {
+    "url": "https://www.amazon.com/Magnetic-Rechargeable-Waterproof-Portable-Emergency/dp/B0F1MR1JSG",
+    "title": "12-24V Amber LED Strobe Light, magnetic (Amazon)"
   },
   "belt_gt2.jpg": {
     "url": "https://aliexpress.us/w/wholesale-gt2-10mm-closed-loop-timing-belt.html",
@@ -14,6 +22,10 @@
   "bms_12s.jpg": {
     "url": "https://www.amazon.com/DALY-Lifepo4-Battery-Protection-Electronic/dp/B0B4JWSQG5",
     "title": "DALY 12S 36V LiFePO4 BMS 60A (Amazon)"
+  },
+  "buzzer.jpg": {
+    "url": "https://rs24.ru/product/2359625",
+    "title": "Оповещатель звуковой Зуммер-1-05 2ТК-12, 85 дБ, 12 В (rs24.ru)"
   },
   "c930e.jpg": {
     "url": "https://www.walmart.com/ip/Logitech-C930e-USB-2-0-HD-Webcam-1920-x-1080-Video-with-Auto-focus-960-000971/24727514",
@@ -56,6 +68,10 @@
   "estop_switch.jpg": {
     "url": "https://amazon.ca/Emergency-Mushroom-Button-Switches-Control/dp/B0FPWZNNB3",
     "title": "ED250 Emergency Stop, red mushroom head (Amazon)"
+  },
+  "fasteners.jpg": {
+    "url": "https://amazon.com/Metric-Assortment-228-Piece-Stainless-Washers/dp/B0F9WHYBVG",
+    "title": "M6 M8 Metric Bolt Assortment Kit with washers and nuts (Amazon)"
   },
   "gy87.jpg": {
     "url": "https://www.daraz.lk/products/gy-87-10dof-module-mpu6050-hmc5883l-bmp180-gy87-sensor-module-3v-5v-gy87-for-arduino-power-high-accurancy-i244301019.html",
@@ -118,9 +134,17 @@
     "url": "https://www.ebay.com/p/881541659",
     "title": "TCST2103 Optical Endstop Switch for RepRap 3D printer (eBay)"
   },
+  "petg.jpg": {
+    "url": "https://walmart.com/ip/Black-PETG-Filament-1-75mm-1kg/712721010",
+    "title": "Black PETG Filament 1.75mm 1kg (Walmart)"
+  },
   "pot_10k.jpg": {
     "url": "https://www.phippselectronics.com/product/10k-ohm-potentiometer-wh148-b10k-pack-of-2/",
     "title": "10K Ohm Linear Potentiometer WH148 B10K (phippselectronics.com)"
+  },
+  "primer_enamel.jpg": {
+    "url": "https://vashdom24.ru/catalog/emali_antikorroziynye_gladkie/grunt_emal_po_rzhavchine_3_v_1_glyants_chernaya_0_9kg_prestizh/",
+    "title": "Грунт-эмаль по ржавчине 3 в 1, чёрная, 0,9 кг (vashdom24.ru)"
   },
   "pulley_gt2_20.jpg": {
     "url": "https://www.amazon.com/gt2-pulley-8mm/s?k=gt2+pulley+8mm",
@@ -130,6 +154,10 @@
     "url": "https://en.uraltone.com/rfid-rc522-1356mhz-key-fob-card-mkh-005.html",
     "title": "RFID-RC522 13.56MHz with Key Fob and Card (uraltone.com)"
   },
+  "reflective_tape.jpg": {
+    "url": "https://www.fowkes.co.za/product/tape-reflective-50mm-x-50m-red-50m-roll-vehicle-conspicuity-e-mark",
+    "title": "Reflective tape 50 mm, red/white, vehicle conspicuity (fowkes.co.za)"
+  },
   "relay4.jpg": {
     "url": "https://robocomp.in/product/4-channel-5v-relay-module-with-optocoupler/",
     "title": "4 Channel 5V Relay Module with Optocoupler (robocomp.in)"
@@ -138,9 +166,17 @@
     "url": "https://bluepacknova.com/product/servo-motor-mg996r%EF%BC%88metal-gear%EF%BC%89/",
     "title": "MG996R Metal Gear High Torque Servo Motor (bluepacknova.com)"
   },
+  "steel_sheet_5.jpg": {
+    "url": "https://alibaba.com/showroom/steel-sheet-5mm-thick.html",
+    "title": "Hot rolled carbon steel sheet, 5 mm (Alibaba)"
+  },
   "stop_light.jpg": {
     "url": "https://thetrailershoppe.com/product/4-round-red-stop-turn-tail-light-24-led",
     "title": "4-inch Round Red Stop, Turn, Tail Light, 24 LED (thetrailershoppe.com)"
+  },
+  "stud_m16.jpg": {
+    "url": "https://www.amazon.fr/Tige-filet%C3%A9e-zingu%C3%A9e-m%C3%A8tre-Qualit%C3%A9/dp/B01EMAEHZW",
+    "title": "Threaded Rod, zinc plated, 1 m, DIN 975, M16 (Amazon)"
   },
   "subaru_hub.jpg": {
     "repo": "docs/assets/images/subaru_hub_bearing.jpg"
@@ -155,6 +191,10 @@
   "thermal_printer.jpg": {
     "url": "https://www.alibaba.com/product-detail/CSN-A2-2-Inch-58mm-Thermal_1600948480312.html",
     "title": "CSN-A2 58mm Thermal Embedded Kiosk Printer, TTL/RS232 (Alibaba)"
+  },
+  "tube_40x40x2.jpg": {
+    "url": "https://tubefittings.eu/en/tubes/275-steel-square-tube-galvanized-40x40x2-mm.html",
+    "title": "Steel square tube 40x40x2 mm (tubefittings.eu)"
   },
   "turn_signal.jpg": {
     "url": "https://us.amazon.com/gp/new-releases/automotive/404801011",
