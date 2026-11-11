@@ -10,7 +10,9 @@ md2pdf.py — генерация PDF-копий Markdown-документов п
 Поддерживаемое подмножество Markdown (то, что реально используется в docs/):
   * заголовки ATX (#..######), горизонтальные линейки (---);
   * абзацы, **жирный**, *курсив*, `моноширинный`, ссылки [текст](url);
-  * таблицы GFM (в т.ч. с разметкой и картинками внутри ячеек);
+  * таблицы GFM (в т.ч. с разметкой, переносом строки <br> и картинками
+    внутри ячеек; в широких таблицах — от шести колонок — картинки
+    выводятся миниатюрами);
   * маркированные и нумерованные списки с вложенностью;
   * цитаты (>) и fenced-блоки кода (```lang) с автоподбором кегля;
   * изображения ![alt](path): JPEG/PNG (Pillow) и SVG (svglib);
@@ -112,6 +114,8 @@ INLINE_RE = re.compile(
     r"|(?P<math>\$(?P<math_text>[^$\n]+?)\$)",
     re.S,
 )
+
+BR_RE = re.compile(r"<br\s*/?>", re.I)
 
 IMAGE_RE = re.compile(r"!\[(?P<alt>[^\]]*)\]\((?P<src>[^)\s]+)(?:\s+\"[^\"]*\")?\)", re.S)
 
@@ -371,6 +375,8 @@ def inline(text: str) -> str:
         return _escape(match.group(0))
 
     out = _protect_markup(INLINE_RE.sub(repl, text))
+    # reportlab понимает только закрытую форму переноса строки
+    out = BR_RE.sub("<br/>", out)
     return out.replace("__MONO__", MONO_FONT_NAME)
 
 
@@ -472,20 +478,23 @@ def split_row(line: str):
         line = line[1:]
     if line.endswith("|") and not line.endswith("\\|"):
         line = line[:-1]
-    cells, buf, escaped = [], [], False
-    for ch in line:
-        if escaped:
-            buf.append(ch)
-            escaped = False
-        elif ch == "\\":
-            escaped = True
-        elif ch == "|":
+    # Экранируется только вертикальная черта. Остальные обратные косые
+    # остаются в тексте: они нужны формулам вида $\\ge 300\\times 250$.
+    cells, buf, pos = [], [], 0
+    while pos < len(line):
+        ch = line[pos]
+        if ch == "\\" and line[pos + 1 : pos + 2] == "|":
+            buf.append("|")
+            pos += 2
+            continue
+        if ch == "|":
             cells.append("".join(buf).strip())
             buf = []
         else:
             buf.append(ch)
+        pos += 1
     cells.append("".join(buf).strip())
-    return [c.replace("\\|", "|") for c in cells]
+    return cells
 
 
 def alignments(sep_row: str):
@@ -496,54 +505,88 @@ def alignments(sep_row: str):
     return result
 
 
-def _token_metrics(text: str, sans: str) -> tuple:
-    """(ширина самого широкого неделимого токена, суммарная ширина текста).
+def _token_metrics(text: str, font_name: str) -> tuple:
+    """(ширина самого широкого неделимого токена, ширина самой длинной строки).
 
     Токены в `обратных кавычках` считаются неделимыми и считаются
-    моноширинным шрифтом; ссылки сводим к видимому тексту.
+    моноширинным шрифтом; ссылки сводим к видимому тексту, картинки не
+    считаем. Неразрывный пробел не делит токен: «12 345,67 ₽» переносить
+    нельзя, и reportlab такую строку тоже не рвёт. <br> делит ячейку на строки.
     """
+    text = IMAGE_RE.sub("", text)
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
     text = re.sub(r"[*_$]", "", text)
-    space = pdfmetrics.stringWidth(" ", sans, 8.4)
-    max_tok, total, count = 0.0, 0.0, 0
-    for match in re.finditer(r"`([^`]+)`|(\S+)", text):
-        token = match.group(1) or match.group(2)
-        font = MONO_FONT_NAME if match.group(1) else sans
-        width = pdfmetrics.stringWidth(token, font, 8.4)
-        max_tok = max(max_tok, width)
-        total += width
-        count += 1
-    total += space * max(count - 1, 0)
-    return max_tok, total
+    space = pdfmetrics.stringWidth(" ", font_name, 8.4)
+    max_tok, longest = 0.0, 0.0
+    for line in BR_RE.split(text):
+        total, count = 0.0, 0
+        for match in re.finditer(r"`([^`]+)`|([^ \t\n\r]+)", line):
+            token = match.group(1) or match.group(2)
+            font = MONO_FONT_NAME if match.group(1) else font_name
+            width = pdfmetrics.stringWidth(token, font, 8.4)
+            max_tok = max(max_tok, width)
+            total += width
+            count += 1
+        longest = max(longest, total + space * max(count - 1, 0))
+    return max_tok, longest
 
 
-def _column_widths(rows, avail_width: float, sans: str):
+#: Ширина картинки в ячейке: обычная и миниатюра для широких таблиц.
+CELL_IMAGE_WIDTH = 118
+THUMBNAIL_WIDTH = 54
+THUMBNAIL_FROM_COLUMNS = 6
+
+
+def _cell_image_width(n_cols: int) -> float:
+    return THUMBNAIL_WIDTH if n_cols >= THUMBNAIL_FROM_COLUMNS else CELL_IMAGE_WIDTH
+
+
+def _column_widths(rows, avail_width: float, sans: str, bold: str | None = None):
+    """Ширины колонок: каждой — не меньше самого длинного неделимого токена.
+
+    Сначала колонка получает свой минимум, затем свободное место делится
+    пропорционально тому, сколько колонке не хватает до текста в одну строку.
+    Колонка, в которой только картинки, остаётся шириной в картинку.
+    """
     n_cols = len(rows[0])
-    mins, desired = [], []
+    bold = bold or sans
+    image_width = _cell_image_width(n_cols)
+    mins, desired, fixed = [], [], []
     for col in range(n_cols):
         body = [rows[i][col] for i in range(1, len(rows))] or [rows[0][col]]
         metrics = [_token_metrics(c, sans) for c in body]
-        head_max, head_total = _token_metrics(rows[0][col], sans)
+        head_max, head_total = _token_metrics(rows[0][col], bold)
         col_min = max([m[0] for m in metrics] + [head_max]) + 10
         col_sum = max([m[1] for m in metrics] + [head_total]) + 10
-        if any(IMAGE_RE.search(r[col]) for r in rows):
-            col_min = max(col_min, 118)
-        mins.append(min(col_min, avail_width * 0.62))
-        desired.append(max(min(col_sum, avail_width * 0.62), 20))
+        has_image = any(IMAGE_RE.search(r[col]) for r in rows)
+        only_images = has_image and all(not IMAGE_RE.sub("", c).strip() for c in body)
+        if has_image:
+            col_min = max(col_min, image_width + 8)
+        col_min = min(col_min, avail_width * 0.62)
+        col_sum = max(min(col_sum, avail_width * 0.62), col_min, 20)
+        if only_images:
+            col_sum = col_min
+        mins.append(col_min)
+        desired.append(col_sum)
+        fixed.append(only_images)
 
-    weights = [d + m * 0.5 for d, m in zip(desired, mins)]
-    widths = [avail_width * w / sum(weights) for w in weights]
+    if sum(mins) >= avail_width:
+        # не помещаются даже минимумы — сжимаем все колонки поровну
+        scale = avail_width / sum(mins)
+        return [m * scale for m in mins]
 
-    # гарантируем, что самый длинный токен не будет разорван
-    deficit = sum(max(0.0, mins[i] - widths[i]) for i in range(n_cols))
-    widths = [max(widths[i], mins[i]) for i in range(n_cols)]
-    donors = [i for i in range(n_cols) if widths[i] > mins[i]]
-    donor_total = sum(widths[i] for i in donors) or 1.0
-    for i in donors:
-        widths[i] -= deficit * widths[i] / donor_total
-
-    scale = avail_width / sum(widths)
-    return [w * scale for w in widths]
+    slack = avail_width - sum(mins)
+    wants = [0.0 if fixed[i] else desired[i] - mins[i] for i in range(n_cols)]
+    if sum(wants) <= slack:
+        # всем хватает места на текст в одну строку; остаток — гибким колонкам
+        widths = [mins[i] + wants[i] for i in range(n_cols)]
+        rest = avail_width - sum(widths)
+        flexible = [i for i in range(n_cols) if not fixed[i]] or list(range(n_cols))
+        base = sum(widths[i] for i in flexible) or 1.0
+        for i in flexible:
+            widths[i] += rest * widths[i] / base
+        return widths
+    return [mins[i] + slack * wants[i] / sum(wants) for i in range(n_cols)]
 
 
 def _aligned_style(style: ParagraphStyle, align: str) -> ParagraphStyle:
@@ -554,7 +597,9 @@ def _aligned_style(style: ParagraphStyle, align: str) -> ParagraphStyle:
     )
 
 
-def _cell_flowables(raw: str, inner_w: float, base_dir: str, ss: StyleSheet1, header: bool):
+def _cell_flowables(
+    raw: str, inner_w: float, base_dir: str, ss: StyleSheet1, header: bool, image_w: float
+):
     if not IMAGE_RE.search(raw):
         style = ss["TableHead"] if header else ss["TableCell"]
         return Paragraph(inline(raw) or "&nbsp;", style)
@@ -564,7 +609,7 @@ def _cell_flowables(raw: str, inner_w: float, base_dir: str, ss: StyleSheet1, he
         before = raw[pos : match.start()].strip()
         if before:
             parts.append(Paragraph(inline(before), ss["TableCell"]))
-        flow = image_flowable(match.group("src"), base_dir, inner_w, ss)
+        flow = image_flowable(match.group("src"), base_dir, min(inner_w, image_w), ss)
         flow.hAlign = "CENTER"
         parts.append(flow)
         pos = match.end()
@@ -578,11 +623,14 @@ def build_table(rows, aligns, avail_width: float, base_dir: str, ss: StyleSheet1
     n_cols = max(len(r) for r in rows)
     rows = [r + [""] * (n_cols - len(r)) for r in rows]
     aligns = (aligns + ["LEFT"] * n_cols)[:n_cols]
-    widths = _column_widths(rows, avail_width, ss["TableCell"].fontName)
+    widths = _column_widths(
+        rows, avail_width, ss["TableCell"].fontName, ss["TableHead"].fontName
+    )
+    image_w = _cell_image_width(n_cols)
 
     data = [
         [
-            _cell_flowables(row[c], widths[c] - 8, base_dir, ss, header=(r == 0))
+            _cell_flowables(row[c], widths[c] - 8, base_dir, ss, r == 0, image_w)
             for c in range(n_cols)
         ]
         for r, row in enumerate(rows)
