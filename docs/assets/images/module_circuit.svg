@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" width="920" height="560" style="background:#0f172a; font-family:'Segoe UI',Roboto,sans-serif;">
   <text x="460" y="32" fill="#f8fafc" font-size="19" font-weight="bold" text-anchor="middle">Принципиальная функциональная схема платы модуля управления</text>
-  <text x="460" y="54" fill="#94a3b8" font-size="13" text-anchor="middle">Arduino Mega Pro Embed + Драйвер TB6600 + собственный 3-фазный MOSFET-инвертор (драйвер BLDC)</text>
+  <text x="460" y="54" fill="#94a3b8" font-size="13" text-anchor="middle">Архивный проект v1.0: Arduino Mega Pro Embed + TB6600 + собственный MOSFET-инвертор. На роботе тягой управляет драйвер ZS-Z11H</text>
 
   <!-- Central Arduino Mega Pro Embed Block -->
   <g transform="translate(30, 80)">
@@ -93,7 +93,7 @@
     <text x="130" y="25" fill="#4ade80" font-size="12" font-weight="bold" text-anchor="middle">ПРИВОД И ИСПОЛНИТЕЛИ</text>
     <text x="15" y="55" fill="#e2e8f0" font-size="10">• Шаговый мотор NEMA 23 (поворот):</text>
     <text x="25" y="72" fill="#94a3b8" font-size="9">  Фазы A+, A-, B+, B- от TB6600</text>
-    <text x="15" y="95" fill="#e2e8f0" font-size="10">• BLDC мотор-колесо 10" (тяга):</text>
+    <text x="15" y="95" fill="#e2e8f0" font-size="10">• BLDC мотор-колесо (тяга):</text>
     <text x="25" y="112" fill="#94a3b8" font-size="9">  3 силовые фазы U, V, W</text>
     <text x="25" y="128" fill="#94a3b8" font-size="9">  5 жил датчиков Холла (5V, GND, H1, H2, H3)</text>
     <text x="15" y="150" fill="#e2e8f0" font-size="10">• Сенсор калибровки азимута:</text>

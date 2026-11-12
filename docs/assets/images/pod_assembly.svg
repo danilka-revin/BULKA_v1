@@ -103,7 +103,7 @@
     <text x="570" y="371" fill="#c084fc" font-size="11" font-weight="bold">Стальная сварная вилка (5–6 мм)</text>
     <text x="570" y="387" fill="#94a3b8" font-size="10">Жестко закреплена к вращающейся части</text>
 
-    <!-- 4. BOTTOM LAYER: XIAOMI M365 PRO MOTOR WHEEL (В ВИЛКЕ) -->
+    <!-- 4. BOTTOM LAYER: AOVO PRO MOTOR WHEEL (В ВИЛКЕ) -->
     <!-- Solid Perforated Rubber Tyre with red rim -->
     <g transform="translate(360, 475)">
       <!-- Tyre Outer Circle -->
@@ -120,7 +120,7 @@
         <circle cx="-23" cy="58" r="8"/><circle cx="23" cy="58" r="8"/>
       </g>
 
-      <!-- Red Rim Ring Accent (Exact as in Xiaomi M365 Pro photo) -->
+      <!-- Red Rim Ring Accent -->
       <circle cx="0" cy="0" r="52" fill="none" stroke="#ef4444" stroke-width="3.5"/>
 
       <!-- Motor Wheel Aluminum Hub (Grey) -->
@@ -131,19 +131,19 @@
       <circle cx="0" cy="0" r="5" fill="#0f172a"/>
 
       <!-- Text inside hub -->
-      <text x="0" y="-18" fill="#f8fafc" font-size="9" font-weight="bold" text-anchor="middle">XIAOMI M365 PRO</text>
-      <text x="0" y="28" fill="#4ade80" font-size="9" font-weight="bold" text-anchor="middle">260W + ЭНКОДЕР</text>
+      <text x="0" y="-18" fill="#f8fafc" font-size="9" font-weight="bold" text-anchor="middle">AOVO PRO 8,5″</text>
+      <text x="0" y="28" fill="#4ade80" font-size="9" font-weight="bold" text-anchor="middle">350 Вт, 36 В</text>
 
       <!-- Motor Phase and Sensor Wires coming out of axle -->
       <path d="M 0 0 Q -40 20 -70 50 Q -90 70 -95 95" fill="none" stroke="#0f172a" stroke-width="5"/>
       <path d="M 0 0 Q -40 20 -70 50 Q -90 70 -95 95" fill="none" stroke="#22c55e" stroke-width="2"/>
-      <text x="-100" y="110" fill="#4ade80" font-size="9" text-anchor="middle">3 фазы + Холл + Энкодер</text>
+      <text x="-100" y="110" fill="#4ade80" font-size="9" text-anchor="middle">3 фазы + датчики Холла</text>
     </g>
 
     <!-- Callout 4 -->
     <path d="M 450 480 L 560 480" stroke="#22c55e" stroke-width="1.5"/>
-    <text x="570" y="474" fill="#4ade80" font-size="11" font-weight="bold">4. Мотор-колесо Xiaomi M365 Pro (260W)</text>
-    <text x="570" y="490" fill="#cbd5e1" font-size="10">Перфорированная бескамерная шина с красным кантом</text>
+    <text x="570" y="474" fill="#4ade80" font-size="11" font-weight="bold">4. Мотор-колесо AOVO Pro (350 Вт)</text>
+    <text x="570" y="490" fill="#cbd5e1" font-size="10">Диаметр 8,5″ (215,9 мм), датчики Холла</text>
     <text x="570" y="506" fill="#94a3b8" font-size="10">Ось надежно зажата в перьях вилки</text>
   </g>
 </svg>
