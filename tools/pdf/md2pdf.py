@@ -337,11 +337,6 @@ def _escape_angles(chunk: str) -> str:
     return chunk.replace("<", "&lt;").replace(">", "&gt;")
 
 
-def _script(sign: str, body: str) -> str:
-    tag = "sub" if sign == "_" else "super"
-    return f"<{tag}>{body}</{tag}>"
-
-
 def _tex_group(text: str, pos: int) -> tuple:
     """Аргумент макроса с позиции pos: {…} с вложенностью, макрос или один знак."""
     while pos < len(text) and text[pos] == " ":

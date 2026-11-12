@@ -112,6 +112,15 @@ python3 -m venv .venv-test && .venv-test/bin/pip install pytest
 формат `@F`/`@TLM`/`@S`, контрольные суммы примеров и число сценариев не могут
 разойтись молча.
 
+Смета и сборщик PDF проверяются так же:
+
+```bash
+.venv-test/bin/pip install -r tools/pdf/requirements.txt
+.venv-test/bin/python -m pytest tools/estimate tools/pdf -q
+# tools/estimate — 30 проверок: арифметика сметы, фотографии, итоги в документах
+# tools/pdf      — 56 проверок: формулы, ширины колонок, PDF есть у каждого документа
+```
+
 ### PDF-копии документации
 
 Каждый Markdown-документ в `docs/` продублирован в PDF рядом с исходником
@@ -364,6 +373,7 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 | :--- | :--- |
 | [`tools/pdf/md2pdf.py`](tools/pdf/md2pdf.py) | Собирает `docs/pdf/*.pdf` из `docs/*.md`; `--check` проверяет актуальность, `--out` меняет каталог |
 | [`tools/pdf/requirements.txt`](tools/pdf/requirements.txt) | Зависимости сборщика: reportlab, svglib, Pillow |
+| [`tools/pdf/test_md2pdf.py`](tools/pdf/test_md2pdf.py) | 56 pytest-проверок сборщика: формулы, перенос строк, ширины колонок, PDF-копия у каждого документа |
 | [`tools/estimate/build_estimate.py`](tools/estimate/build_estimate.py) | Собирает `docs/COST_ESTIMATE.md` и `docs/estimate/cost_estimate_calculated.csv` из таблиц сметы; `--check`, `--totals`, `--rate` |
 | [`tools/estimate/add_photo.py`](tools/estimate/add_photo.py) | Готовит фотографию позиции 180 × 180 и записывает её источник (нужен Pillow) |
 | [`tools/estimate/test_estimate.py`](tools/estimate/test_estimate.py) | 30 pytest-проверок сметы: арифметика, полнота фотографий и источников, совпадение итогов в документах |
