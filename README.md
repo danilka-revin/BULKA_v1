@@ -2,7 +2,7 @@
 
 [![ROS 2](https://img.shields.io/badge/ROS_2-Humble%20%7C%20Jazzy-blue.svg)](https://docs.ros.org/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04%20%7C%2026.04%20LTS-E95420.svg)](https://ubuntu.com/)
-[![Firmware](https://img.shields.io/badge/Прошивка-motor__wheel%20fw25-00979D.svg)](firmware/README.md)
+[![Firmware](https://img.shields.io/badge/Прошивка-motor__wheel%20fw26%20%2B%20sensor__module%204-00979D.svg)](firmware/README.md)
 [![MCU](https://img.shields.io/badge/MCU-Arduino%20Mega%202560%20%2F%20Mega%20Mini-00979D.svg)](firmware/README.md)
 [![Drive](https://img.shields.io/badge/Тяга-ZS--Z11H%20%2B%20Servo-22c55e.svg)](firmware/README.md)
 [![Payload](https://img.shields.io/badge/Payload-250%20kg-red.svg)](#2-основные-технические-характеристики)
@@ -16,14 +16,23 @@
 >
 > | Репозиторий | Роль | Содержимое |
 > | :--- | :--- | :--- |
-> | **этот** (`rus_slam`) | **главный по прошивке и железу** | `firmware/` — единственный источник истины для контроллеров колёс, `docs/ELECTRICAL_AND_PINOUTS.md`, `pcb/`, механическая документация |
+> | **этот** (`rus_slam`) | **главный по прошивке и железу** | `firmware/` — единственный источник истины для четырёх контроллеров колёс и модуля датчиков, `docs/ELECTRICAL_AND_PINOUTS.md`, `pcb/`, механическая документация, смета |
 > | [danilka-revin/Zapret](https://github.com/danilka-revin/Zapret) | **побочный, весь бортовой софт** | `robot_control/`, `slam_gui/`, `run.py`, веб-пульт, киоск, навигация, лидар, BMS |
 >
-> Прошивка робота — [`firmware/motor_wheel/motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino)
-> (**fw25**, 4 платы по одному USB на колесо, текстовый протокол).
-> Бортовой софт из Zapret только *потребляет* этот протокол; при изменении кадров
+> Прошивок две, плат пять, у каждой свой USB-кабель и текстовый протокол:
+>
+> * [`firmware/motor_wheel/motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino) —
+>   **fw26**, четыре платы колёс. Новое в fw26: отдельный измеренный угол
+>   потенциометра `pa` в телеметрии, наклон калибровки любого знака переживает
+>   перезапуск, удержание угла прерывается при потере сигнала датчика;
+> * [`firmware/sensor_module/sensor_module.ino`](firmware/sensor_module/sensor_module.ino) —
+>   **протокол 4**, плата модуля датчиков: свет, замок грузового отсека, карты
+>   доступа с ролями, компас.
+>
+> Бортовой софт из Zapret только *потребляет* эти протоколы; при изменении кадров
 > сначала правятся скетч и [`docs/SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md)
-> здесь, затем парсер в Zapret.
+> здесь, затем парсер в Zapret. Что и когда перенесено между репозиториями —
+> [`docs/ZAPRET_SYNC.md`](docs/ZAPRET_SYNC.md).
 >
 > ROS 2-пакеты (`ros2_ws/`) и веб-пульт (`gui/`) описывают архитектуру и
 > интерфейсы робота; рабочий софт — в Zapret.
@@ -31,9 +40,39 @@
 > Старая прошивка `firmware/module_controller` (бинарный протокол `0xAA 0x55` /
 > `0xBB 0x44`, собственная 6-тактная коммутация MOSFET) **удалена из репозитория**:
 > она не соответствует ни железу, ни софту робота. Соответствующие разделы
-> документов переписаны под fw25.
+> документов переписаны под текущую прошивку (fw26).
 
 Проект разработан в соответствии с требованиями конкурсного задания № 2: **«Автономное роботизированное устройство для внутренней логистики Научно-технического центра (НТЦ) АО «АВТОВАЗ»»** ([Регламент соревнований](https://pervye-events.hb.ru-msk.vkcloud-storage.ru/projects/documents/aac931ed623a48abb28c4cf1d844b4da.pdf)).
+
+---
+
+## 💰 Смета на изготовление
+
+Один робот стоит **369 170,85 ₽ (4 461,09 USD)**: комплектующие и материалы — 298 170,85 ₽, работа, амортизация оборудования и интеграция — 71 000,00 ₽. По каждой из 64 позиций — фотография, количество, цена в рублях и долларах США и продавцы, у которых она найдена: [`docs/COST_ESTIMATE.md`](docs/COST_ESTIMATE.md) ([PDF](docs/pdf/COST_ESTIMATE.pdf)).
+
+| Раздел сметы | Позиций | Сумма, ₽ | Сумма, USD |
+| :--- | ---: | ---: | ---: |
+| Поворотно-тяговые модули | 14 | 83 333,20 | 1 007,00 |
+| Модуль датчиков, свет и доступ | 14 | 12 823,44 | 154,96 |
+| Навигация и машинное зрение | 4 | 86 730,00 | 1 048,05 |
+| Бортовой компьютер и интерфейс оператора | 6 | 45 682,97 | 552,04 |
+| Аккумулятор и электропитание | 13 | 43 885,80 | 530,32 |
+| Безопасность и сигнализация | 6 | 11 418,94 | 137,99 |
+| Рама, корпус и крепёж | 7 | 14 296,50 | 172,76 |
+| **Комплектующие и материалы** | **64** | **298 170,85** | **3 603,12** |
+| Работа, амортизация оборудования, интеграция | — | 71 000,00 | 857,97 |
+| **Всего на один робот** | | **369 170,85** | **4 461,09** |
+
+- Цены собраны 11.11.2026 из поисковой выдачи, страницы магазинов не открывались. Курс — 82,7536 ₽ за доллар (официальный курс Банка России на 10.11.2026).
+- Цена позиции — медиана найденных предложений. По самым дешёвым предложениям итог равен 310 702,88 ₽, по самым дорогим — 438 672,67 ₽. Доставка не учтена.
+- 18 позиций — допущения о модели или количестве, 4 — оценки без поиска цен. Работа, амортизация и интеграция перенесены без пересчёта из прежней калькуляции, где итог был 207 200 ₽.
+- Смета собирается из таблиц [`docs/estimate/`](docs/estimate/README.md): поменяйте цену или количество и запустите сборщик.
+
+```bash
+python3 tools/estimate/build_estimate.py            # пересобрать docs/COST_ESTIMATE.md из таблиц
+python3 tools/estimate/build_estimate.py --check    # проверить, что документ соответствует таблицам
+python3 tools/estimate/build_estimate.py --rate 85  # показать итоги при другом курсе, файлы не менять
+```
 
 ---
 
@@ -43,14 +82,16 @@
 | :--- | :--- | :--- | :--- |
 | 📘 **Полный технический паспорт** | Инженерные расчеты прочности рамы под 250 кг, редуктора GT2 150/20, ступиц Subaru, АКБ | [`docs/TECHNICAL_SPECIFICATION.md`](docs/TECHNICAL_SPECIFICATION.md) | [`PDF`](docs/pdf/TECHNICAL_SPECIFICATION.pdf) |
 | 📑 **Пояснительная записка по регламенту** | Пояснительная записка по критериям задания № 2 (экономика, сравнение с 3 аналогами, методика тестов) | [`docs/EXPLANATORY_NOTE_AVTOVAZ.md`](docs/EXPLANATORY_NOTE_AVTOVAZ.md) | [`PDF`](docs/pdf/EXPLANATORY_NOTE_AVTOVAZ.pdf) |
+| 💰 **Смета на изготовление** | 64 позиции с фотографиями, количеством, ценой в рублях и долларах США и ссылками на продавцов; итог **369 170,85 ₽ (4 461,09 USD)** | [`docs/COST_ESTIMATE.md`](docs/COST_ESTIMATE.md) | [`PDF`](docs/pdf/COST_ESTIMATE.pdf) |
+| 🔄 **Синхронизация с Zapret** | Что перенесено из бортового ПО: fw26, модуль датчиков, фактический состав робота; какие расхождения остались | [`docs/ZAPRET_SYNC.md`](docs/ZAPRET_SYNC.md) | [`PDF`](docs/pdf/ZAPRET_SYNC.pdf) |
 | ⚡ **Электрические схемы и подключения** | Распиновка Mega (D2–D8, D18, D19, A0), TB6600, драйвер тяги ZS-Z11H, питание и предохранители | [`docs/ELECTRICAL_AND_PINOUTS.md`](docs/ELECTRICAL_AND_PINOUTS.md) | [`PDF`](docs/pdf/ELECTRICAL_AND_PINOUTS.pdf) |
-| 💻 **Прошивка микроконтроллеров** | `motor_wheel` **fw25**: 4 платы Mega 2560/Mega Mini, по одному USB на колесо, роль в CRC-телеметрии, калибровка по оптодатчику и потенциометру, активное удержание угла, сохранённый полный ноль, команды тяги и руля | [`firmware/README.md`](firmware/README.md) · [`motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino) | — |
-| 🧪 **Проверка прошивки без железа** | Хост-симуляция четырёх плат (TB6600, оптодатчик, потенциометр, EEPROM) — 58 сценариев; сборка avr-gcc без Arduino IDE | [`firmware/firmware_sim/`](firmware/firmware_sim/sim.cpp) · [`firmware/tools/avr_build.py`](firmware/tools/avr_build.py) | — |
+| 💻 **Прошивка микроконтроллеров** | `motor_wheel` **fw26**: 4 платы Mega 2560/Mega Mini, по одному USB на колесо, роль в CRC-телеметрии, калибровка по оптодатчику и потенциометру, активное удержание угла, сохранённый полный ноль, команды тяги и руля. `sensor_module` **протокол 4**: пятая плата — свет, замок отсека, карты доступа, компас | [`firmware/README.md`](firmware/README.md) · [`motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino) · [`sensor_module.ino`](firmware/sensor_module/sensor_module.ino) | — |
+| 🧪 **Проверка прошивки без железа** | Хост-симуляция четырёх плат колёс (TB6600, оптодатчик, потенциометр, EEPROM) — 61 сценарий; симуляция модуля датчиков (GY-87, RC522, лента, реле, замок) — 20 сценариев; сборка avr-gcc без Arduino IDE | [`firmware/firmware_sim/`](firmware/firmware_sim/sim.cpp) · [`sensor_sim.cpp`](firmware/firmware_sim/sensor_sim.cpp) · [`firmware/tools/avr_build.py`](firmware/tools/avr_build.py) | — |
 | 📐 **Эталонный скетч руля** | Проверенный на реальной механике скетч, с которым сверяются пины, уровни и скорости | [`firmware/reference/`](firmware/reference/steering_tested/steering_tested.ino) | — |
-| 🎛 **Печатная плата модуля (PCB)** | Инженерный архив v1.0: BOM, Netlist, распиновки, гайд. **Пины не совпадают с fw25** — см. [`pcb/STATUS.md`](pcb/STATUS.md) | [`pcb/`](pcb/README.md) | — |
+| 🎛 **Печатная плата модуля (PCB)** | Инженерный архив v1.0: BOM, Netlist, распиновки, гайд. **Пины не совпадают с прошивкой колеса** — см. [`pcb/STATUS.md`](pcb/STATUS.md) | [`pcb/`](pcb/README.md) | — |
 | 🧠 **Архитектура ПО (ROS 2)** | Справочная архитектура: пакеты, узлы, топики, дерево TF, режимы запуска. Рабочий софт — в Zapret | [`docs/SOFTWARE_ARCHITECTURE.md`](docs/SOFTWARE_ARCHITECTURE.md) | [`PDF`](docs/pdf/SOFTWARE_ARCHITECTURE.pdf) |
 | 🔗 **Причинно-следственная карта** | Сквозные связи «требование → железо → прошивка → ROS → навигация/GUI», разрывы интеграции и проверенные ограничения | [`docs/CAUSAL_MAP.md`](docs/CAUSAL_MAP.md) | [`PDF`](docs/pdf/CAUSAL_MAP.pdf) |
-| 🔌 **Протокол обмена** | Текстовые команды и кадры `@F`/`@TLM`/`@Z` между бортовым ПК и платами колёс, CRC16/Modbus, таймауты | [`docs/SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md) | [`PDF`](docs/pdf/SERIAL_PROTOCOL.pdf) |
+| 🔌 **Протокол обмена** | Текстовые команды и кадры `@F`/`@TLM`/`@Z` плат колёс (fw26, поле `pa`), кадры `@S`/`@CARD`/`@EVT`/`@ACK` модуля датчиков, CRC16/Modbus, таймауты | [`docs/SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md) | [`PDF`](docs/pdf/SERIAL_PROTOCOL.pdf) |
 | 🤖 **Пакеты ROS 2** | Справочно: кинематика, мост модулей, одометрия, лидар, восприятие, навигация, безопасность, запуск. Для реального железа требуется доработка моста | [`ros2_ws/README.md`](ros2_ws/README.md) | — |
 | 🖥 **GUI — пульт робота** | Справочно: веб-пульт, карта SLAM, окно камеры. Рабочий пульт — в Zapret | [`gui/`](gui/README.md) · [`docs/GUI.md`](docs/GUI.md) | [`PDF`](docs/pdf/GUI.pdf) |
 | 🖥 **Основной экран робота** | Справочно: киоск, 4 двигателя, АКБ, PIN и грузовой отсек; нативное Tkinter-приложение | [`gui/native_display.py`](gui/native_display.py) · [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) · [`docs/RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
@@ -60,12 +101,25 @@
 
 ```bash
 python3 -m venv .venv-test && .venv-test/bin/pip install pytest
-.venv-test/bin/python -m pytest firmware/tests/test_firmware_sim.py -q   # 5 проверок + 58 сценариев
+.venv-test/bin/python -m pytest firmware/tests -q
+# test_firmware_sim.py   — плата колеса: 10 проверок, внутри 61 сценарий симуляции
+# test_sensor_module.py  — модуль датчиков: 17 проверок, внутри 20 сценариев симуляции
 ```
 
-Тест собирает `firmware/motor_wheel` g++ в четырёх экземплярах, прогоняет все
-сценарии симуляции и **сверяет документы со скетчем**: пины, 133.33 шага/град,
-предел ±100°, watchdog 650 мс и формат `@F`/`@TLM` не могут разойтись молча.
+Тесты собирают оба скетча `g++` (плату колеса — в четырёх экземплярах, модуль
+датчиков — с лентой и без неё), прогоняют все сценарии симуляции и **сверяют
+документы со скетчами**: пины, 133.33 шага/град, предел ±100°, watchdog 650 мс,
+формат `@F`/`@TLM`/`@S`, контрольные суммы примеров и число сценариев не могут
+разойтись молча.
+
+Смета и сборщик PDF проверяются так же:
+
+```bash
+.venv-test/bin/pip install -r tools/pdf/requirements.txt
+.venv-test/bin/python -m pytest tools/estimate tools/pdf -q
+# tools/estimate — 30 проверок: арифметика сметы, фотографии, итоги в документах
+# tools/pdf      — 56 проверок: формулы, ширины колонок, PDF есть у каждого документа
+```
 
 ### PDF-копии документации
 
@@ -90,16 +144,19 @@ python3 -m venv .venv && .venv/bin/pip install -r tools/pdf/requirements.txt
 rus_slam/
 ├── README.md                  ← эта страница-указатель
 ├── docs/                      документация (Markdown)
-│   ├── *.md                   10 документов, список ниже
-│   ├── pdf/                   готовые PDF-копии тех же 10 документов
+│   ├── *.md                   12 документов, список ниже
+│   ├── pdf/                   готовые PDF-копии тех же 12 документов
+│   ├── estimate/              таблицы сметы: состав, цены, источники фото
 │   └── assets/
 │       ├── images/            14 иллюстраций, вставленных в документы
+│       ├── estimate/          61 фотография позиций сметы
 │       └── screens/           9 настоящих скриншотов пульта и экрана робота
-├── firmware/                  прошивка контроллеров колёс (главное содержимое)
-│   ├── README.md              руководство по прошивке fw25
-│   ├── motor_wheel/           боевой скетч motor_wheel.ino
+├── firmware/                  прошивка пяти плат (главное содержимое)
+│   ├── README.md              руководство по прошивке: fw26 и модуль датчиков
+│   ├── motor_wheel/           боевой скетч колеса motor_wheel.ino
+│   ├── sensor_module/         скетч модуля датчиков sensor_module.ino
 │   ├── reference/             эталонный скетч руля + его описание
-│   ├── firmware_sim/          хост-симуляция четырёх плат (без железа)
+│   ├── firmware_sim/          хост-симуляция обеих прошивок (без железа)
 │   ├── tests/                 pytest-проверки прошивки и документов
 │   ├── scripts/               сборка, заливка, синхронизация, диагностика
 │   └── tools/                 сборщик avr-gcc без Arduino IDE
@@ -111,7 +168,9 @@ rus_slam/
 │   ├── tools/                 сборка исполняемого файла дисплея
 │   └── tests/                 JS- и Python-тесты интерфейса
 ├── ros2_ws/src/               восемь ROS 2-пакетов
-└── tools/pdf/                 сборщик PDF из Markdown
+└── tools/
+    ├── pdf/                   сборщик PDF из Markdown
+    └── estimate/              сборщик сметы из таблиц и её тесты
 ```
 
 ### 📄 Документы `docs/` — исходник и PDF рядом по смыслу
@@ -124,6 +183,8 @@ rus_slam/
 | :--- | :--- | :--- |
 | Технический паспорт робота | [`TECHNICAL_SPECIFICATION.md`](docs/TECHNICAL_SPECIFICATION.md) | [`PDF`](docs/pdf/TECHNICAL_SPECIFICATION.pdf) |
 | Пояснительная записка по регламенту | [`EXPLANATORY_NOTE_AVTOVAZ.md`](docs/EXPLANATORY_NOTE_AVTOVAZ.md) | [`PDF`](docs/pdf/EXPLANATORY_NOTE_AVTOVAZ.pdf) |
+| Смета на изготовление робота | [`COST_ESTIMATE.md`](docs/COST_ESTIMATE.md) | [`PDF`](docs/pdf/COST_ESTIMATE.pdf) |
+| Синхронизация с Zapret | [`ZAPRET_SYNC.md`](docs/ZAPRET_SYNC.md) | [`PDF`](docs/pdf/ZAPRET_SYNC.pdf) |
 | Электрические схемы и распиновка | [`ELECTRICAL_AND_PINOUTS.md`](docs/ELECTRICAL_AND_PINOUTS.md) | [`PDF`](docs/pdf/ELECTRICAL_AND_PINOUTS.pdf) |
 | Протокол обмена с платами | [`SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md) | [`PDF`](docs/pdf/SERIAL_PROTOCOL.pdf) |
 | Причинно-следственная карта | [`CAUSAL_MAP.md`](docs/CAUSAL_MAP.md) | [`PDF`](docs/pdf/CAUSAL_MAP.pdf) |
@@ -132,6 +193,15 @@ rus_slam/
 | Основной экран робота | [`MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
 | Сервисный пульт | [`SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) | [`PDF`](docs/pdf/SERVICE_CONSOLE.pdf) |
 | Запуск и доступ к роботу | [`RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) | [`PDF`](docs/pdf/RUN_AND_ACCESS.pdf) |
+
+`COST_ESTIMATE.md` руками не правят: его собирает
+[`tools/estimate/build_estimate.py`](tools/estimate/build_estimate.py) из таблиц
+[`docs/estimate/`](docs/estimate/README.md) — состава
+([`parts.csv`](docs/estimate/parts.csv)), найденных цен
+([`price_observations.csv`](docs/estimate/price_observations.csv)), курса и разделов
+([`estimate.json`](docs/estimate/estimate.json)) и источников фотографий
+([`photo_sources.json`](docs/estimate/photo_sources.json)). Фотографии позиций —
+в [`docs/assets/estimate/`](docs/assets/estimate).
 
 Иллюстрации к документам лежат в [`docs/assets/images/`](docs/assets/images):
 [`arduino_mega_pro.jpg`](docs/assets/images/arduino_mega_pro.jpg) / [`arduino_mega_pro.png`](docs/assets/images/arduino_mega_pro.png), [`belt_reduction_drive.png`](docs/assets/images/belt_reduction_drive.png),
@@ -169,24 +239,27 @@ rus_slam/
 | Файл / каталог | Что это |
 | :--- | :--- |
 | [`firmware/README.md`](firmware/README.md) | Полное руководство: пины, команды, калибровка, телеметрия, безопасность |
-| [`firmware/motor_wheel/motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino) | **Боевой скетч fw25** — то, что заливается в платы колёс |
-| [`firmware/reference/README.md`](firmware/reference/README.md) | Разбор эталонного скетча: чем он отличается от fw25 и почему |
+| [`firmware/motor_wheel/motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino) | **Боевой скетч fw26** — то, что заливается в четыре платы колёс |
+| [`firmware/sensor_module/sensor_module.ino`](firmware/sensor_module/sensor_module.ino) | **Скетч модуля датчиков, протокол 4** — пятая плата: GY-87, RC522, 4 реле, адресная лента 73 диода, серво замка |
+| [`firmware/reference/README.md`](firmware/reference/README.md) | Разбор эталонного скетча: чем он отличается от боевого и почему |
 | [`firmware/reference/steering_tested/steering_tested.ino`](firmware/reference/steering_tested/steering_tested.ino) | Скетч руля, проверенный на реальной механике |
-| [`firmware/firmware_sim/sim.cpp`](firmware/firmware_sim/sim.cpp) | Хост-симуляция четырёх плат: 58 сценариев |
+| [`firmware/firmware_sim/sim.cpp`](firmware/firmware_sim/sim.cpp) | Хост-симуляция четырёх плат колёс: 61 сценарий |
+| [`firmware/firmware_sim/sensor_sim.cpp`](firmware/firmware_sim/sensor_sim.cpp) | Хост-симуляция модуля датчиков: 20 сценариев |
 | [`firmware/firmware_sim/arduino_sim.h`](firmware/firmware_sim/arduino_sim.h) · [`board_prelude.h`](firmware/firmware_sim/board_prelude.h) | Обвязка симуляции: подмена Arduino API и EEPROM |
-| [`firmware/firmware_sim/stubs/`](firmware/firmware_sim/stubs) | Заглушки для сборки `g++`: [`Arduino.h`](firmware/firmware_sim/stubs/Arduino.h), [`Servo.h`](firmware/firmware_sim/stubs/Servo.h), [`avr/eeprom.h`](firmware/firmware_sim/stubs/avr/eeprom.h), [`avr/interrupt.h`](firmware/firmware_sim/stubs/avr/interrupt.h), [`avr/pgmspace.h`](firmware/firmware_sim/stubs/avr/pgmspace.h) |
-| [`firmware/tests/test_firmware_sim.py`](firmware/tests/test_firmware_sim.py) | 5 pytest-проверок: симуляция, кадры `@F`/`@TLM`, пины против документов |
-| [`firmware/tools/avr_build.py`](firmware/tools/avr_build.py) | Сборка `.hex` через avr-gcc без Arduino IDE |
+| [`firmware/firmware_sim/stubs/`](firmware/firmware_sim/stubs) | Заглушки для сборки `g++`: [`Arduino.h`](firmware/firmware_sim/stubs/Arduino.h), [`Servo.h`](firmware/firmware_sim/stubs/Servo.h), [`Wire.h`](firmware/firmware_sim/stubs/Wire.h), [`SPI.h`](firmware/firmware_sim/stubs/SPI.h), [`EEPROM.h`](firmware/firmware_sim/stubs/EEPROM.h), [`Adafruit_NeoPixel.h`](firmware/firmware_sim/stubs/Adafruit_NeoPixel.h), [`avr/eeprom.h`](firmware/firmware_sim/stubs/avr/eeprom.h), [`avr/interrupt.h`](firmware/firmware_sim/stubs/avr/interrupt.h), [`avr/pgmspace.h`](firmware/firmware_sim/stubs/avr/pgmspace.h), [`avr/wdt.h`](firmware/firmware_sim/stubs/avr/wdt.h) |
+| [`firmware/tests/test_firmware_sim.py`](firmware/tests/test_firmware_sim.py) | 10 pytest-проверок платы колеса: симуляция, кадры `@F`/`@TLM`, поле `pa`, пины против документов |
+| [`firmware/tests/test_sensor_module.py`](firmware/tests/test_sensor_module.py) | 17 pytest-проверок модуля датчиков: пины, безопасное состояние, симуляция, кадры, документы |
+| [`firmware/tools/avr_build.py`](firmware/tools/avr_build.py) | Сборка `.hex` через avr-gcc без Arduino IDE (Servo и Adafruit NeoPixel подключаются по `#include` скетча) |
 
 ### 🧰 Скрипты `firmware/scripts/`
 
 | Скрипт | Назначение |
 | :--- | :--- |
 | [`install_arduino_cli.sh`](firmware/scripts/install_arduino_cli.sh) | Поставить `arduino-cli` и ядро AVR |
-| [`avr_upload.py`](firmware/scripts/avr_upload.py) | Залить `.hex` в плату по USB (`--check` — только осмотр) |
-| [`flash_firmware.sh`](firmware/scripts/flash_firmware.sh) | Собрать и залить сразу все четыре платы |
-| [`firmware_probe.py`](firmware/scripts/firmware_probe.py) | Прочитать `?`-ответ и версию прошивки с плат |
-| [`sync_firmware_desktop.sh`](firmware/scripts/sync_firmware_desktop.sh) | Синхронизировать прошивку с копией на рабочем столе |
+| [`avr_upload.py`](firmware/scripts/avr_upload.py) | Собрать и залить `.hex` в плату по USB (`--check` — только осмотр); сам находит или скачивает ядро AVR, Servo и Adafruit NeoPixel |
+| [`flash_firmware.sh`](firmware/scripts/flash_firmware.sh) | Собрать и залить сразу все четыре платы колёс |
+| [`firmware_probe.py`](firmware/scripts/firmware_probe.py) | Прочитать версию прошивки с плат колёс |
+| [`sync_firmware_desktop.sh`](firmware/scripts/sync_firmware_desktop.sh) | Положить на рабочий стол четыре копии скетча колеса по ролям и скетч модуля датчиков |
 
 ### 🚀 Автозапуск `deploy/`
 
@@ -205,7 +278,7 @@ rus_slam/
 [`easyeda_schematic_guide.md`](pcb/easyeda_schematic_guide.md) ·
 [`BOM.csv`](pcb/BOM.csv) · [`CONNECTOR_PINOUTS.csv`](pcb/CONNECTOR_PINOUTS.csv) ·
 [`kicad_netlist.net`](pcb/kicad_netlist.net).
-**Пины платы не совпадают с fw25** — она прошивкой не используется, см. `STATUS.md`.
+**Пины платы не совпадают с прошивкой колеса** — она прошивкой не используется, см. `STATUS.md`.
 
 ### 🖥 Интерфейсы `gui/`
 
@@ -294,12 +367,16 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 
 </details>
 
-### 🛠 Инструменты `tools/pdf/`
+### 🛠 Инструменты `tools/`
 
 | Файл | Что делает |
 | :--- | :--- |
 | [`tools/pdf/md2pdf.py`](tools/pdf/md2pdf.py) | Собирает `docs/pdf/*.pdf` из `docs/*.md`; `--check` проверяет актуальность, `--out` меняет каталог |
 | [`tools/pdf/requirements.txt`](tools/pdf/requirements.txt) | Зависимости сборщика: reportlab, svglib, Pillow |
+| [`tools/pdf/test_md2pdf.py`](tools/pdf/test_md2pdf.py) | 56 pytest-проверок сборщика: формулы, перенос строк, ширины колонок, PDF-копия у каждого документа |
+| [`tools/estimate/build_estimate.py`](tools/estimate/build_estimate.py) | Собирает `docs/COST_ESTIMATE.md` и `docs/estimate/cost_estimate_calculated.csv` из таблиц сметы; `--check`, `--totals`, `--rate` |
+| [`tools/estimate/add_photo.py`](tools/estimate/add_photo.py) | Готовит фотографию позиции 180 × 180 и записывает её источник (нужен Pillow) |
+| [`tools/estimate/test_estimate.py`](tools/estimate/test_estimate.py) | 30 pytest-проверок сметы: арифметика, полнота фотографий и источников, совпадение итогов в документах |
 | [`.gitignore`](.gitignore) | Что не попадает в репозиторий (сборки, PDF-кэш, venv) |
 
 ---
@@ -310,8 +387,8 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 | :---: | :---: | :--- |
 | **Опорно-поворотный узел**<br>(Ступицы Subaru) | <img src="docs/assets/images/subaru_hub_bearing.jpg" width="220"/> | Автомобильные ступицы Subaru Forester/Impreza с двухрядным радиально-упорным подшипником. Нулевой люфт, динамическая стойкость >38 кН (с избытком выдерживает нагрузку 250 кг). |
 | **Привод поворота**<br>(NEMA 23 + Редуктор 1:7.5) | <img src="docs/assets/images/nema23_motor.jpg" width="180"/><br><img src="docs/assets/images/belt_reduction_drive.png" width="200"/> | Шаговый двигатель NEMA 23 (1.9 Н·м, 2.8 А) с зубчато-ременной передачей **GT2 10 мм** (шкивы $z_1=20$, $z_2=150$, $i=7.5$). Итоговый момент на ступице: **13.68 Н·м**, дискретность: **0.03°**. |
-| **Тяговый привод 4WD**<br>(Мотор-колеса Xiaomi M365 Pro) | <img src="docs/assets/images/scooter_hub_motor.jpg" width="200"/> | 4 мотор-колеса Xiaomi Mijia M365 Pro (10", BLDC) номинальной мощностью **260 Вт** каждое, с датчиками Холла и выходом тахометра `SC`. Суммарно 1040 Вт ном. |
-| **Локальный контроллер**<br>(Arduino Mega 2560 / Mega Mini) | <img src="docs/assets/images/arduino_mega_pro.jpg" width="210"/> | ATmega2560 (16 МГц, 54 I/O), по 1 плате на каждый из 4 модулей, **свой USB-кабель на каждое колесо**. Шаги руля — Timer2 (10 кГц), тяга — библиотека `Servo` на D3, телеметрия — текстовые кадры с CRC16. |
+| **Тяговый привод 4WD**<br>(Мотор-колеса AOVO Pro) | <img src="docs/assets/images/scooter_hub_motor.jpg" width="200"/> | 4 мотор-колеса электросамоката AOVO Pro (8,5", BLDC 36 В) номинальной мощностью **350 Вт** каждое, с датчиками Холла; скорость измеряется по выходу тахометра `SC` драйвера. Суммарно 1400 Вт ном. Фото — иллюстрация, не снимок установленного колеса. |
+| **Локальный контроллер**<br>(Arduino Mega 2560 / Mega Mini) | <img src="docs/assets/images/arduino_mega_pro.jpg" width="210"/> | ATmega2560 (16 МГц, 54 I/O), по 1 плате на каждый из 4 модулей и пятая — в модуле датчиков, **свой USB-кабель у каждой платы**. Шаги руля — Timer2 (10 кГц), тяга — библиотека `Servo` на D3, телеметрия — текстовые кадры с CRC16. |
 | **Драйвер шаговика**<br>(TB6600) | <img src="docs/assets/images/tb6600_driver.jpg" width="200"/> | Микрошаговый драйвер (ток 2.8 А), оптоизолированные входы PUL/DIR/ENA на **D6/D7/D8**, 133.33 шага/град по прошивке, ≈75 °/с. |
 | **Драйвер тяги**<br>(RioRand ZS-Z11H) | <img src="docs/assets/images/bldc_mosfet_driver.jpg" width="210"/> | **Фактический драйвер робота:** готовый 3-фазный драйвер BLDC (ZS-Z11H, бездатчиковый аналог — ZS-X11F). Arduino задаёт тягу сигналом Servo на вход «P» (D3), сторону — DIR (D4), тормоз — BRAKE (D5), разрешение — STOP (D2), читает тахометр SC (D19). Собственный MOSFET-инвертор в `pcb/` — архив v1.0, прошивкой **не используется**. |
 | **Тяговая батарея**<br>(LiFePO4 32700 12S3P) | <img src="docs/assets/images/lifepo4_32700.png" width="200"/> | 36 ячеек LiFePO4 32700 (3.2 В, 6200 мА·ч). Номинал 38.4 В, 18.6 А·ч, 714.2 Вт·ч. Высокая безопасность (не горит, не взрывается), ресурс >2500 циклов. |
@@ -321,8 +398,8 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 ## 🏗 Архитектура системы управления
 
 Комплекс построен по двухуровневой схеме управления:
-1. **Верхний уровень:** Бортовой компьютер под управлением **Ubuntu 24.04/26.04 LTS** со стеком **ROS 2**. Обеспечивает картографирование и локализацию (SLAM), планирование маршрута (Nav2) на основе данных **Лидара LDC 01**, распознавание дорожных знаков («Стоп», «Пешеходный переход», «Искусственная неровность») и светофоров камерой, а также расчет кинематики 4WIS/4WID.
-2. **Нижний уровень:** 4 независимых контроллера поворотно-тяговых модулей (**Arduino Mega 2560 / Mega Mini**), каждый со своим USB-кабелем в бортовой ПК. Контроллер выдаёт шаги NEMA 23 (TB6600, D6/D7/D8), управляет драйвером тяги **RioRand ZS-Z11H** (Servo D3, DIR D4, BRAKE D5, STOP D2), читает оптодатчик нуля (D18), потенциометр положения (A0) и тахометр SC (D19), и отдаёт текстовую телеметрию `@F`/`@TLM` с CRC16.
+1. **Верхний уровень:** Бортовой мини-ПК под управлением **Ubuntu** с бортовым ПО [Zapret](https://github.com/danilka-revin/Zapret): веб-пульт оператора, карта занятости и локализация по **лидару LDS-01** (скан приходит через драйвер ROS 2), глубина Kinect 360, круговой обзор с четырёх камер Logitech C930e, собственный планировщик маршрута и расчет кинематики 4WIS/4WID. Nav2 не используется. Распознавание дорожных знаков и светофора **не реализовано**.
+2. **Нижний уровень:** 4 независимых контроллера поворотно-тяговых модулей (**Arduino Mega 2560 / Mega Mini**), каждый со своим USB-кабелем в бортовой ПК. Контроллер выдаёт шаги NEMA 23 (TB6600, D6/D7/D8), управляет драйвером тяги **RioRand ZS-Z11H** (Servo D3, DIR D4, BRAKE D5, STOP D2), читает оптодатчик нуля (D18), потенциометр положения (A0) и тахометр SC (D19), и отдаёт текстовую телеметрию `@F`/`@TLM` с CRC16. Пятая плата — модуль датчиков: инерциальный модуль GY-87, считыватель карт RC522, четыре реле света, адресная лента и сервопривод замка грузового отсека.
 
 ![Архитектура системы](docs/assets/images/system_architecture.svg)
 
@@ -330,11 +407,14 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 
 ## 🛠 Фотографии изготовленного шасси (Промежуточный конструктив)
 
-Реальные фотографии изготовленной несущей рамы и ходовой части мобильной платформы на этапе механической сборки в мастерской (сварочный полуавтомат Aurora PRO Overman, профиль 40×40 мм со скошенными углами 45°, ступицы Subaru, колеса Xiaomi M365 Pro):
+Реальные фотографии изготовленной несущей рамы и ходовой части мобильной платформы на этапе механической сборки в мастерской (сварочный полуавтомат Aurora PRO Overman, профиль 40×40 мм со скошенными углами 45°, ступицы Subaru, мотор-колёса в вилках):
 
 | Вид сверху (Рама 40×40 мм, скосы 45°, ступицы Subaru) | Вид сбоку (Вертикальный стек: шпилька → ступица → вилка) | Перспектива 3/4 (Шасси в сборе на 4 колесах) |
 | :---: | :---: | :---: |
 | <img src="docs/assets/images/chassis_top.jpg" width="280"/> | <img src="docs/assets/images/chassis_side.jpg" width="280"/> | <img src="docs/assets/images/chassis_perspective.jpg" width="280"/> |
+
+> Файлы `chassis_*.jpg` в репозиторий не добавлены, поэтому на месте фотографий
+> пусто. Ссылки оставлены как место для них.
 
 ---
 
@@ -349,7 +429,7 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
                      │
   3. [ПОВОРОТНАЯ СТАЛЬНАЯ ВИЛКА]     (СНИЗУ, закреплена к вращающейся части ступицы)
                      │
-  4. [МОТОР-КОЛЕСО XIAOMI M365 PRO]  (В ВИЛКЕ, перфорированная шина с красным кантом)
+  4. [МОТОР-КОЛЕСО AOVO PRO 350 Вт]   (В ВИЛКЕ, 8,5 дюйма, датчики Холла)
 ```
 
 ![Конструкция модуля](docs/assets/images/pod_assembly.svg)
@@ -360,7 +440,7 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 - **Приводная шестерня/шкив сверху:** Ведомый шкив **GT2 10 мм** ($z_2 = 150$), ведущий шкив NEMA 23 ($z_1 = 20$), редукция $1:7.5$;
 - **Крутящий момент поворота:** Результирующий момент на ступице **13.68 Н·м** (запас >35% при повороте на месте с грузом 250 кг);
 - **Поворотная вилка снизу:** Сварная из листовой стали 5–6 мм;
-- **Тяговый привод:** Бесщеточное мотор-колесо Xiaomi M365 Pro 10 дюймов (260 Вт) с цельнолитыми перфорированными шинами, датчиками Холла и встроенным квадратурным энкодером (каналы A/B).
+- **Тяговый привод:** Бесщеточное мотор-колесо электросамоката AOVO Pro 8,5 дюйма (36 В, 350 Вт) с датчиками Холла. Скорость колеса прошивка считает по выходу тахометра SC драйвера тяги.
 
 ---
 
@@ -406,24 +486,25 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 | **Габариты платформы (Д × Ш × В)** | **750 × 600 × 400 мм** | Норматив: от 600×400×400 до 1200×800×800 мм ✅ |
 | **Полезная грузоподъемность** | **250 кг** | Подтверждено расчетом прочности рамы 40×40 мм и ступиц Subaru ✅ |
 | **Размер отсека для груза** | 420 × 340 × 200 мм | Норматив: прямоугольник $\ge 300\times 250\times 60$, цилиндр $\ge 200\times 100$ мм ✅ |
-| **Защита груза** | Герметичный отсек IP65 + замок с авторизацией по QR/RFID | Защита от осадков и несанкционированного доступа ✅ |
+| **Защита груза** | Герметичный отсек IP65 + замок на сервоприводе, доступ по картам MIFARE (считыватель RC522) с ролями | Защита от осадков и несанкционированного доступа ✅ |
 | **Материал рамы** | Стальная профильная труба 40×40×2 мм, сварная | Прочный цельносварной металлокаркас ✅ |
 | **Опорно-поворотные узлы** | Автомобильные ступицы Subaru Forester/Impreza | Двухрядные подшипники, запас прочности под 250 кг груза ✅ |
 | **Привод поворота** | 4 × NEMA 23 + ремень **GT2 10 мм** (шкивы 150 и 20), TB6600 на D6/D7/D8 | Редукция 1:7.5, момент 13.68 Н·м, **133.33 шага/град (0.0075°)** по прошивке ✅ |
-| **Тяговый привод** | 4 × мотор-колеса Xiaomi M365 Pro 10" (по **260 Вт** BLDC) + драйверы RioRand ZS-Z11H | Полноприводное шасси 4WD, суммарно 1040 Вт ном. ✅ |
-| **Управление модулями** | 4 платы (Arduino Mega 2560/Pro + TB6600 + драйвер тяги ZS-Z11H), по одному USB на колесо | Распределённая сеть контроллеров с CRC-телеметрией ✅ |
-| **Прошивка** | `firmware/motor_wheel` **fw25**: калибровка по оптодатчику, потенциометр A0, активное удержание угла, сохранённый полный ноль | Единый источник истины для контроллеров ✅ |
+| **Тяговый привод** | 4 × мотор-колеса AOVO Pro 8,5" (по **350 Вт** BLDC) + драйверы RioRand ZS-Z11H | Полноприводное шасси 4WD, суммарно 1400 Вт ном. ✅ |
+| **Управление модулями** | 4 платы колёс (Arduino Mega 2560/Pro + TB6600 + драйвер тяги ZS-Z11H) и плата модуля датчиков, у каждой свой USB | Распределённая сеть контроллеров с CRC-телеметрией ✅ |
+| **Прошивка** | `firmware/motor_wheel` **fw26**: калибровка по оптодатчику, потенциометр A0 с отдельным измеренным углом, активное удержание угла, сохранённый полный ноль; `firmware/sensor_module` протокол 4: свет, замок, карты, компас | Единый источник истины для контроллеров ✅ |
 | **Бортовой компьютер** | Ubuntu 24.04/26.04 LTS, софт из репозитория **Zapret** (лидар через ROS 2-драйверы, навигация по карте) | Автономная навигация без оператора ✅ |
-| **Сенсоры навигации** | **Лидар LDC 01** (360°) + Камера машинного зрения | Распознавание знаков («Стоп», светофор, неровность) ✅ |
-| **Световая/звуковая сигнализация**| Светоотражающая оклейка 3M, янтарный маячок, звуковой зуммер 85 дБ | Безопасность в темное время суток и на производстве ✅ |
-| **Статус испытаний** | Программа контрольных тестов разработана по регламенту | Готовность к полигонным испытаниям на этапе соревнований ✅ |
+| **Сенсоры навигации** | **Лидар LDS-01** (360°, 0,12–3,5 м) + Kinect 360 + 4 камеры Logitech C930e | Карта, локализация и объезд препятствий ✅. Распознавание знаков («Стоп», светофор, неровность) **не реализовано** ❌ |
+| **Световая/звуковая сигнализация**| Фары, стоп-сигналы и указатели поворота через реле, световая лента из 73 диодов, светоотражающая оклейка. Маячок и звуковой зуммер есть в смете, прошивка ими пока не управляет | Световая сигнализация ✅, звуковая — в работе |
+| **Статус испытаний** | Программа контрольных тестов разработана по регламенту | Результатов полигонных испытаний в репозитории нет |
+| **Стоимость комплекта** | **369 170,85 ₽ (4 461,09 USD)** на один робот | [Смета](docs/COST_ESTIMATE.md): 64 позиции с ценами и продавцами |
 
 ---
 
 ### Экран робота и веб-пульт (демо-режим)
 
 > `gui/` работает с демо-источником `sim`; бинарные кадры 10/16 Б в `backend.py`
-> **не соответствуют** прошивке fw25 — актуальный протокол в
+> **не соответствуют** прошивке fw26 — актуальный протокол в
 > [`docs/SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md).
 
 ```bash
@@ -455,21 +536,24 @@ python3 gui/tests/main.api.test.js     # 19 сквозных: экран ↔ ж�
 Окно **«Сервис»** (вкладка в сайдбаре) закрывает требования задания № 2 по
 защите груза: доступ к ячейке хранения по PIN (заводской `2580`; 5 неудачных
 попыток — блокировка 30 с), журнал доступа с хеш-цепочкой, ручное управление
-каждым из 4 модулей (руль + тяга, строки протокола fw25), контроль АКБ 12S3P и
+каждым из 4 модулей (руль + тяга, строки протокола прошивки колеса), контроль АКБ 12S3P и
 статистика с выгрузкой CSV/JSON/печатью. Подробности — [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md).
 
 ---
 
 ## 🚀 Прошивка, сборка и запуск
 
-### 1. Прошивка плат колёс (главный шаг этого репозитория)
+### 1. Прошивка плат (главный шаг этого репозитория)
 
-Одна плата — одно колесо. Каждая плата прошивается **своей ролью**.
+Одна плата — одно колесо. Каждая плата колеса прошивается **своей ролью**;
+пятая плата — модуль датчиков — своим скетчем.
 
 ```bash
-# 1. Проверить, что скетч вообще собирается (без железа)
+# 1. Проверить, что скетчи вообще собираются (без железа)
 g++ -std=c++17 -O1 -w -I firmware/firmware_sim/stubs \
     firmware/firmware_sim/sim.cpp -o /tmp/wheel-sim && /tmp/wheel-sim
+g++ -std=c++17 -O1 -w -I firmware/firmware_sim/stubs \
+    firmware/firmware_sim/sensor_sim.cpp -o /tmp/sensor-sim && /tmp/sensor-sim
 
 # 2. Собрать .hex тем же avr-gcc, что в Arduino IDE (без IDE)
 AVR_ROOT=/путь/к/avr CORE_ROOT=/путь/к/ArduinoCore-avr SERVO_ROOT=/путь/к/Servo \
@@ -478,10 +562,16 @@ python3 firmware/tools/avr_build.py firmware/motor_wheel/motor_wheel.ino
 # 3. Или собрать и залить одну плату без Arduino IDE
 python3 firmware/scripts/avr_upload.py --check
 python3 firmware/scripts/avr_upload.py --sketch-dir firmware/motor_wheel --port /dev/ttyUSB0
+python3 firmware/scripts/avr_upload.py --sketch-dir firmware/sensor_module --port /dev/ttyUSB4
 
-# 4. Прочитать версию прошивки с плат (fw=25)
+# 4. Прочитать версию прошивки с плат колёс (fw=26)
 python3 firmware/scripts/firmware_probe.py
 ```
+
+> **Порядок обновления до fw26:** сначала бортовой софт (Zapret, коммит
+> `973f9ba` от 09.11.2026 или новее), затем платы. Новый сервер понимает и кадры прежних прошивок (fw22–25), а старый сервер кадр `@F`
+> с полем `pa` отбрасывает. Программа платы не перепрошивает — fw26 заливается
+> вручную в каждую из четырёх.
 
 В Arduino IDE: откройте [`firmware/motor_wheel/motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino),
 задайте `MODULE_ID` (`"FL"`, `"FR"`, `"RL"`, `"RR"`), выберите **Arduino Mega or
@@ -503,8 +593,11 @@ cd robot-control
 ./scripts/install_ubuntu.sh        # окружение, .env, оператор, ярлык «Запустить робот»
 ```
 
-По умолчанию `RC_SLAM_SOURCE=master`: бортовой экран сам находит четыре платы по
-CRC-защищённой роли FL/FR/RL/RR из прошивки fw22+ — порты вручную не назначаются.
+В режиме `RC_SLAM_SOURCE=master` бортовой процесс открывает только те четыре
+порта, которые перечислены в `RC_WHEEL_PORTS`. Порты всех устройств назначает
+оператор на странице «Устройства» (`/devices`): автопоиска нет. Порядок портов
+колёс в списке не важен — роль FL/FR/RL/RR каждая плата сообщает сама в
+CRC-защищённой телеметрии (fw22+).
 
 ### 3. ROS 2-стек
 
@@ -517,7 +610,7 @@ ros2 launch rus_slam_bringup robot.launch.py sim:=true   # проверка гр
 Эти пакеты описывают архитектуру (кинематика, одометрия, мост модулей, Nav2,
 восприятие) и **не используются на роботе**. Мост `module_bridge_node` в них
 рассчитан на удалённый бинарный протокол; для реального железа нужен
-`module_link.py` под текстовый протокол fw25 — см.
+`module_link.py` под текстовый протокол прошивки колеса — см.
 [`docs/SOFTWARE_ARCHITECTURE.md`](docs/SOFTWARE_ARCHITECTURE.md), §10.
 
 ---
