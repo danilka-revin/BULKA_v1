@@ -18,7 +18,7 @@
 ## 1. Перенесённые файлы
 
 Скетчи совпадают с Zapret побайтно. В симуляции и скриптах отличаются только
-пути: здесь всё лежит внутри `firmware/`.
+пути к файлам и к корню репозитория: здесь всё лежит внутри `firmware/`.
 
 | Файл в Zapret | Файл здесь | Сравнение |
 | :--- | :--- | :--- |
@@ -27,10 +27,10 @@
 | `firmware/reference/steering_tested/steering_tested.ino` | [`firmware/reference/steering_tested/steering_tested.ino`](../firmware/reference/steering_tested/steering_tested.ino) | совпадает |
 | `firmware/tools/avr_build.py` | [`firmware/tools/avr_build.py`](../firmware/tools/avr_build.py) | совпадает |
 | `tests/firmware_sim/arduino_sim.h`, `board_prelude.h` | [`firmware/firmware_sim/`](../firmware/firmware_sim) | совпадают |
-| `tests/firmware_sim/sim.cpp`, `sensor_sim.cpp` | [`firmware/firmware_sim/`](../firmware/firmware_sim) | отличаются пути в комментариях о сборке |
-| `tests/firmware_sim/stubs/` | [`firmware/firmware_sim/stubs/`](../firmware/firmware_sim/stubs) | отличаются пути в двух комментариях |
-| `scripts/avr_upload.py` | [`firmware/scripts/avr_upload.py`](../firmware/scripts/avr_upload.py) | отличаются пути в справке и корень репозитория |
-| `scripts/sync_firmware_desktop.sh` | [`firmware/scripts/sync_firmware_desktop.sh`](../firmware/scripts/sync_firmware_desktop.sh) | отличается путь к корню репозитория |
+| `tests/firmware_sim/sim.cpp`, `sensor_sim.cpp` | [`firmware/firmware_sim/`](../firmware/firmware_sim) | другие пути в комментариях |
+| `tests/firmware_sim/stubs/` | [`firmware/firmware_sim/stubs/`](../firmware/firmware_sim/stubs) | другие пути в комментариях |
+| `scripts/avr_upload.py` | [`firmware/scripts/avr_upload.py`](../firmware/scripts/avr_upload.py) | другие пути в справке и к корню |
+| `scripts/sync_firmware_desktop.sh` | [`firmware/scripts/sync_firmware_desktop.sh`](../firmware/scripts/sync_firmware_desktop.sh) | другой путь к корню |
 
 Тесты здесь свои: [`firmware/tests/`](../firmware/tests) собирают оба скетча,
 прогоняют симуляцию и сверяют документы со скетчами.

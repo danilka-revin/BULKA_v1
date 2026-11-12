@@ -14,9 +14,13 @@ md2pdf.py — генерация PDF-копий Markdown-документов п
     внутри ячеек; в широких таблицах — от шести колонок — картинки
     выводятся миниатюрами);
   * маркированные и нумерованные списки с вложенностью;
-  * цитаты (>) и fenced-блоки кода (```lang) с автоподбором кегля;
-  * изображения ![alt](path): JPEG/PNG (Pillow) и SVG (svglib);
-  * простая inline-математика $...$ ($z_2 = 150$, $\\ge$, $\\times$).
+  * цитаты (>) и fenced-блоки кода (```lang) с автоподбором кегля; строки,
+    которые не влезают даже мелким кеглем, переносятся;
+  * изображения ![alt](path): JPEG/PNG (Pillow) и SVG (svglib; фон тёмных
+    схем берётся из style="background:…" корневого элемента);
+  * формулы: строчные $...$ и выключные $$...$$ на одной строке. Понимается
+    подмножество LaTeX: индексы, \\frac, \\sqrt, \\text, \\mathbf, греческие
+    буквы и знаки (\\ge, \\times, \\approx …). Дробь печатается как a/b.
 
 Зависимости (хватает virtualenv, системные пакеты не нужны):
     python3 -m venv .venv
@@ -111,7 +115,10 @@ INLINE_RE = re.compile(
     r"|(?P<bold>\*\*(?P<bold_text>.+?)\*\*|__(?P<bold_text2>.+?)__)"
     r"|(?P<italic>(?<![\w*])\*(?P<italic_text>[^*\n]+?)\*(?![\w*])"
     r"|(?<![\w_])_(?P<italic_text2>[^_\n]+?)_(?![\w_]))"
-    r"|(?P<math>\$(?P<math_text>[^$\n]+?)\$)",
+    r"|(?P<dmath>\$\$(?P<dmath_text>[^$\n]+?)\$\$)"
+    # как в Pandoc: формула не начинается и не кончается пробелом, после неё не цифра —
+    # иначе за формулу принимается текст между двумя знаками доллара
+    r"|(?P<math>\$(?=\S)(?P<math_text>[^$\n]+?)(?<=\S)\$(?!\d))",
     re.S,
 )
 
@@ -125,24 +132,38 @@ LIST_RE = re.compile(r"^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)$")
 FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*([\w+-]*)\s*$")
 TABLE_SEP_RE = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$")
 
-MATH_MACROS = {
-    r"\ge": "≥",
-    r"\geq": "≥",
-    r"\le": "≤",
-    r"\leq": "≤",
-    r"\times": "×",
-    r"\pm": "±",
-    r"\approx": "≈",
-    r"\cdot": "·",
-    r"\to": "→",
-    r"\rightarrow": "→",
-    r"\Delta": "Δ",
-    r"\pi": "π",
-    r"\Omega": "Ω",
-    r"\omega": "ω",
-    r"\mu": "μ",
-    r"\rho": "ρ",
-    r"\circ": "°",
+#: Макросы LaTeX (без обратной косой) -> символ. Формулы в документах простые,
+#: поэтому хватает подстановки символов и нескольких конструкций, см. _tex().
+MATH_SYMBOLS = {
+    "ge": "≥", "geq": "≥", "le": "≤", "leq": "≤", "ne": "≠", "neq": "≠",
+    "times": "×", "pm": "±", "approx": "≈", "cdot": "·", "in": "∈", "infty": "∞",
+    "to": "→", "rightarrow": "→", "ldots": "…", "dots": "…", "circ": "°",
+    "quad": " ", "qquad": " ", "left": "", "right": "",
+    "Delta": "Δ", "Omega": "Ω", "Sigma": "Σ",
+    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ", "eta": "η",
+    "theta": "θ", "lambda": "λ", "mu": "μ", "pi": "π", "rho": "ρ",
+    "sigma": "σ", "tau": "τ", "phi": "φ", "varphi": "φ", "omega": "ω",
+}
+MATH_FUNCTIONS = {
+    "arctan", "arcsin", "arccos", "sin", "cos", "tan", "min", "max", "log", "ln", "exp",
+}
+MATH_UPRIGHT = {"text", "textrm", "mathrm", "operatorname"}
+MATH_BOLD = {"mathbf", "textbf", "boldsymbol"}
+
+#: Служебные знаки: разметка формулы собирается из них и превращается в теги
+#: только после экранирования текста.
+_M_UP, _M_DOWN = "\ue000", "\ue001"  # прямой (не курсивный) текст
+_M_B, _M_BE = "\ue002", "\ue003"  # полужирный
+_M_SUB, _M_SUBE = "\ue004", "\ue005"  # нижний индекс
+_M_SUP, _M_SUPE = "\ue006", "\ue007"  # верхний индекс
+_M_BREAK = "\ue008"  # перенос строки вокруг выключной формулы $$…$$
+_M_TAGS = {
+    _M_B: "<b>",
+    _M_BE: "</b>",
+    _M_SUB: "<sub>",
+    _M_SUBE: "</sub>",
+    _M_SUP: "<super>",
+    _M_SUPE: "</super>",
 }
 
 ALIGN_MAP = {"CENTER": TA_CENTER, "RIGHT": TA_RIGHT, "LEFT": TA_LEFT}
@@ -321,15 +342,146 @@ def _script(sign: str, body: str) -> str:
     return f"<{tag}>{body}</{tag}>"
 
 
+def _tex_group(text: str, pos: int) -> tuple:
+    """Аргумент макроса с позиции pos: {…} с вложенностью, макрос или один знак."""
+    while pos < len(text) and text[pos] == " ":
+        pos += 1
+    if pos >= len(text):
+        return "", pos
+    if text[pos] == "\\":
+        macro = re.match(r"\\(?:[A-Za-z]+|.)", text[pos:])
+        return macro.group(0), pos + macro.end()
+    if text[pos] != "{":
+        return text[pos], pos + 1
+    depth, i = 0, pos
+    while i < len(text):
+        if text[i] == "\\":  # экранированный знак группу не открывает и не закрывает
+            i += 2
+            continue
+        if text[i] == "{":
+            depth += 1
+        elif text[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[pos + 1 : i], i + 1
+        i += 1
+    return text[pos + 1 :], len(text)
+
+
+def _tex_plain(text: str, scripts: bool = True) -> str:
+    """Формула без служебных знаков разметки; scripts=False — ещё и без индексов."""
+    if not scripts:
+        text = re.sub("[\ue004\ue006][^\ue005\ue007]*[\ue005\ue007]", "", text)
+    return re.sub("[\ue000-\ue008]", "", text).strip()
+
+
+def _tex_fraction(num: str, den: str, tail: str) -> str:
+    """a/b для простых частей, (a b) / (c d) для составных.
+
+    Если сразу за простой дробью идёт множитель, она берётся в скобки:
+    «(1/2)√(…)» читается однозначно, «1/2√(…)» — нет.
+    """
+    parts = (_tex_plain(num, scripts=False), _tex_plain(den, scripts=False))
+    simple = all(part and not re.search(r"[\s+\-−×·/=]", part) for part in parts)
+    if not simple:
+        return f"({num.strip()}) / ({den.strip()})"
+    macro = re.match(r"\\([A-Za-z]+)", tail)
+    if macro:  # множитель-макрос: корень, дробь, текст, греческая буква
+        name = macro.group(1)
+        glued = (
+            name in ("sqrt", "frac", "dfrac", "tfrac")
+            or name in MATH_UPRIGHT
+            or name in MATH_BOLD
+            or MATH_SYMBOLS.get(name, "").isalpha()
+        )
+    else:  # множитель — буква, цифра или открывающая скобка
+        glued = bool(re.match(r"[^\W_]|[(\[]", tail))
+    return f"({num}/{den})" if glued else f"{num}/{den}"
+
+
+def _tex(text: str) -> str:
+    """Подмножество LaTeX -> текст со служебными знаками разметки."""
+    out, pos = [], 0
+    while pos < len(text):
+        ch = text[pos]
+        if ch in "_^":
+            body, pos = _tex_group(text, pos + 1)
+            inner = _tex(body)
+            if ch == "^" and _tex_plain(inner) == "°":
+                out.append("°")
+            elif ch == "_":
+                out.append(_M_SUB + inner + _M_SUBE)
+            else:
+                out.append(_M_SUP + inner + _M_SUPE)
+            continue
+        if ch in "{}":  # группирующие скобки без макроса не печатаются
+            pos += 1
+            continue
+        if ch != "\\":
+            out.append(ch)
+            pos += 1
+            continue
+        macro = re.match(r"\\([A-Za-z]+)", text[pos:])
+        if not macro:
+            # «\,» — неразрывный пробел, «\;» «\:» «\ » — пробел, «\!» — ничего;
+            # «\_» «\%» «\{» «\}» — сам знак
+            mark = text[pos + 1 : pos + 2]
+            if mark == ",":
+                out.append("\u00a0")
+            elif mark in (";", ":", " "):
+                out.append(" ")
+            elif mark != "!":
+                out.append(mark)
+            pos += 2
+            continue
+        name = macro.group(1)
+        pos += macro.end()
+        if name in MATH_UPRIGHT:
+            body, pos = _tex_group(text, pos)
+            out.append(_M_UP + body + _M_DOWN)
+        elif name in MATH_BOLD:
+            body, pos = _tex_group(text, pos)
+            out.append(_M_B + _tex(body) + _M_BE)
+        elif name in ("frac", "dfrac", "tfrac"):
+            num, pos = _tex_group(text, pos)
+            den, pos = _tex_group(text, pos)
+            out.append(_tex_fraction(_tex(num), _tex(den), text[pos:]))
+        elif name == "sqrt":
+            body, pos = _tex_group(text, pos)
+            out.append("√(" + _tex(body).strip() + ")")
+        elif name in MATH_FUNCTIONS:
+            out.append(_M_UP + name + _M_DOWN)
+        elif name in MATH_SYMBOLS:
+            out.append(MATH_SYMBOLS[name])
+        else:  # неизвестный макрос: печатается имя, обратная косая в PDF не нужна
+            out.append(name)
+    return "".join(out)
+
+
 def _math_markup(raw: str) -> str:
-    """$z_2 = 150$ -> <i>z<sub>2</sub> = 150</i>, $\\ge$ -> ≥ и т.п."""
-    text = raw.strip()
-    for macro, repl in MATH_MACROS.items():
-        text = text.replace(macro, repl)
-    text = _escape(text)
-    text = re.sub(r"([_^])\{([^{}]+)\}", lambda m: _script(m.group(1), m.group(2)), text)
-    text = re.sub(r"([_^])(\w)", lambda m: _script(m.group(1), m.group(2)), text)
-    return f"<i>{text}</i>"
+    """$z_2 = 150$ -> <i>z</i><sub><i>2</i></sub><i> = 150</i>; дроби, корни, \\text.
+
+    Курсивом набирается каждый кусок текста отдельно: так теги всегда вложены
+    правильно, даже когда прямой текст \\text{…} стоит внутри \\mathbf{…}.
+    """
+    text = re.sub(r"[ \t]+", " ", _tex(raw.strip()))
+    # пробел перед \text{ …} и пробел внутри него — это один пробел, а не два
+    text = re.sub(" (?=[\ue000-\ue007]* )", "", text)
+    out, upright = [], 0
+    for chunk in re.split("([\ue000-\ue007])", text):
+        if not chunk:
+            continue
+        if chunk == _M_UP:
+            upright += 1
+        elif chunk == _M_DOWN:
+            upright -= 1
+        elif chunk in _M_TAGS:
+            out.append(_M_TAGS[chunk])
+        elif upright or not chunk.strip():
+            out.append(_escape(chunk))
+        else:
+            out.append(f"<i>{_escape(chunk)}</i>")
+    return "".join(out)
 
 
 def _protect_markup(text: str) -> str:
@@ -370,6 +522,8 @@ def inline(text: str) -> str:
         if match.group("italic"):
             body = match.group("italic_text") or match.group("italic_text2") or ""
             return f"<i>{inline(body)}</i>"
+        if match.group("dmath"):  # выключная формула — на отдельной строке
+            return _M_BREAK + _math_markup(match.group("dmath_text")) + _M_BREAK
         if match.group("math"):
             return _math_markup(match.group("math_text"))
         return _escape(match.group(0))
@@ -377,6 +531,9 @@ def inline(text: str) -> str:
     out = _protect_markup(INLINE_RE.sub(repl, text))
     # reportlab понимает только закрытую форму переноса строки
     out = BR_RE.sub("<br/>", out)
+    # вокруг выключных формул — по одному переносу, по краям абзаца — ни одного
+    out = re.sub(rf"\s*{_M_BREAK}(?:\s*{_M_BREAK})*\s*", _M_BREAK, out).strip(_M_BREAK)
+    out = out.replace(_M_BREAK, "<br/>")
     return out.replace("__MONO__", MONO_FONT_NAME)
 
 
@@ -526,24 +683,32 @@ def alignments(sep_row: str):
     return result
 
 
-def _token_metrics(text: str, font_name: str) -> tuple:
+def _token_metrics(text: str, font_name: str, bold_name: str | None = None) -> tuple:
     """(ширина самого широкого неделимого токена, ширина самой длинной строки).
 
     Токены в `обратных кавычках` считаются неделимыми и считаются
     моноширинным шрифтом; ссылки сводим к видимому тексту, картинки не
     считаем. Неразрывный пробел не делит токен: «12 345,67 ₽» переносить
     нельзя, и reportlab такую строку тоже не рвёт. <br> делит ячейку на строки.
+    Ячейка с **жирным** текстом меряется жирным шрифтом: он шире обычного.
     """
     text = IMAGE_RE.sub("", text)
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
-    text = re.sub(r"[*_$]", "", text)
+    if bold_name and "**" in text:
+        font_name = bold_name
     space = pdfmetrics.stringWidth(" ", font_name, 8.4)
     max_tok, longest = 0.0, 0.0
     for line in BR_RE.split(text):
         total, count = 0.0, 0
         for match in re.finditer(r"`([^`]+)`|([^ \t\n\r]+)", line):
-            token = match.group(1) or match.group(2)
-            font = MONO_FONT_NAME if match.group(1) else font_name
+            if match.group(1) is not None:
+                # имя в коде печатается целиком: LOCK_SERVO, а не LOCKSERVO
+                token, font = match.group(1), MONO_FONT_NAME
+            else:
+                # знаки разметки Markdown не печатаются
+                token, font = re.sub(r"[*$]", "", match.group(2)).strip("_"), font_name
+            if not token:
+                continue
             width = pdfmetrics.stringWidth(token, font, 8.4)
             max_tok = max(max_tok, width)
             total += width
@@ -562,27 +727,28 @@ def _cell_image_width(n_cols: int) -> float:
     return THUMBNAIL_WIDTH if n_cols >= THUMBNAIL_FROM_COLUMNS else CELL_IMAGE_WIDTH
 
 
-def _column_widths(rows, avail_width: float, sans: str, bold: str | None = None):
-    """Ширины колонок: каждой — не меньше самого длинного неделимого токена.
+#: Поля ячейки слева и справа: обычные и сжатые — для таблиц, которым не
+#: хватает ширины страницы на самые длинные слова.
+CELL_PAD = 4.0
+CELL_PAD_TIGHT = 2.5
 
-    Сначала колонка получает свой минимум, затем свободное место делится
-    пропорционально тому, сколько колонке не хватает до текста в одну строку.
-    Колонка, в которой только картинки, остаётся шириной в картинку.
-    """
+
+def _column_limits(rows, avail_width: float, sans: str, bold: str, pad: float) -> tuple:
+    """Для каждой колонки: минимум, желаемая ширина и признак «только картинки»."""
     n_cols = len(rows[0])
-    bold = bold or sans
     image_width = _cell_image_width(n_cols)
+    extra = 2 * pad + 2  # поля ячейки и небольшой запас на погрешность измерения
     mins, desired, fixed = [], [], []
     for col in range(n_cols):
         body = [rows[i][col] for i in range(1, len(rows))] or [rows[0][col]]
-        metrics = [_token_metrics(c, sans) for c in body]
+        metrics = [_token_metrics(c, sans, bold) for c in body]
         head_max, head_total = _token_metrics(rows[0][col], bold)
-        col_min = max([m[0] for m in metrics] + [head_max]) + 10
-        col_sum = max([m[1] for m in metrics] + [head_total]) + 10
+        col_min = max([m[0] for m in metrics] + [head_max]) + extra
+        col_sum = max([m[1] for m in metrics] + [head_total]) + extra
         has_image = any(IMAGE_RE.search(r[col]) for r in rows)
         only_images = has_image and all(not IMAGE_RE.sub("", c).strip() for c in body)
         if has_image:
-            col_min = max(col_min, image_width + 8)
+            col_min = max(col_min, image_width + 2 * pad)
         col_min = min(col_min, avail_width * 0.62)
         col_sum = max(min(col_sum, avail_width * 0.62), col_min, 20)
         if only_images:
@@ -590,11 +756,23 @@ def _column_widths(rows, avail_width: float, sans: str, bold: str | None = None)
         mins.append(col_min)
         desired.append(col_sum)
         fixed.append(only_images)
+    return mins, desired, fixed
 
+
+def _distribute(mins, desired, fixed, avail_width: float) -> list:
+    """Делит ширину страницы между колонками с учётом их минимумов."""
+    n_cols = len(mins)
     if sum(mins) >= avail_width:
-        # не помещаются даже минимумы — сжимаем все колонки поровну
-        scale = avail_width / sum(mins)
-        return [m * scale for m in mins]
+        # Не помещаются даже минимумы. Сжимаются только самые широкие колонки:
+        # в них длинные неделимые строки вроде путей к файлам, и reportlab
+        # перенесёт их по знакам. Колонки с обычными словами остаются при своей
+        # ширине, чтобы слова в них не рвались.
+        widths, rest = [0.0] * n_cols, avail_width
+        order = sorted(range(n_cols), key=lambda i: mins[i])
+        for rank, col in enumerate(order):
+            widths[col] = min(mins[col], rest / (n_cols - rank))
+            rest -= widths[col]
+        return widths
 
     slack = avail_width - sum(mins)
     wants = [0.0 if fixed[i] else desired[i] - mins[i] for i in range(n_cols)]
@@ -608,6 +786,23 @@ def _column_widths(rows, avail_width: float, sans: str, bold: str | None = None)
             widths[i] += rest * widths[i] / base
         return widths
     return [mins[i] + slack * wants[i] / sum(wants) for i in range(n_cols)]
+
+
+def _column_widths(rows, avail_width: float, sans: str, bold: str | None = None) -> tuple:
+    """(ширины колонок, поле ячейки): каждой колонке — не меньше её самого длинного слова.
+
+    Сначала колонка получает свой минимум, затем свободное место делится
+    пропорционально тому, сколько колонке не хватает до текста в одну строку.
+    Колонка, в которой только картинки, остаётся шириной в картинку. Если
+    минимумы не помещаются, сначала сжимаются поля ячеек, и только потом
+    уступают самые широкие колонки.
+    """
+    bold = bold or sans
+    for pad in (CELL_PAD, CELL_PAD_TIGHT):
+        mins, desired, fixed = _column_limits(rows, avail_width, sans, bold, pad)
+        if sum(mins) <= avail_width:
+            break
+    return _distribute(mins, desired, fixed, avail_width), pad
 
 
 def _aligned_style(style: ParagraphStyle, align: str) -> ParagraphStyle:
@@ -644,14 +839,14 @@ def build_table(rows, aligns, avail_width: float, base_dir: str, ss: StyleSheet1
     n_cols = max(len(r) for r in rows)
     rows = [r + [""] * (n_cols - len(r)) for r in rows]
     aligns = (aligns + ["LEFT"] * n_cols)[:n_cols]
-    widths = _column_widths(
+    widths, pad = _column_widths(
         rows, avail_width, ss["TableCell"].fontName, ss["TableHead"].fontName
     )
     image_w = _cell_image_width(n_cols)
 
     data = [
         [
-            _cell_flowables(row[c], widths[c] - 8, base_dir, ss, r == 0, image_w)
+            _cell_flowables(row[c], widths[c] - 2 * pad, base_dir, ss, r == 0, image_w)
             for c in range(n_cols)
         ]
         for r, row in enumerate(rows)
@@ -670,8 +865,8 @@ def build_table(rows, aligns, avail_width: float, base_dir: str, ss: StyleSheet1
                 ("BACKGROUND", (0, 0), (-1, 0), ACCENT),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#9fb3c8")),
-                ("LEFTPADDING", (0, 0), (-1, -1), 4),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), pad),
+                ("RIGHTPADDING", (0, 0), (-1, -1), pad),
                 ("TOPPADDING", (0, 0), (-1, -1), 3.5),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 3.5),
                 (
@@ -698,12 +893,47 @@ def parse_markdown(text: str, base_dir: str, ss: StyleSheet1, avail_width: float
     return _blocks(lines, 0, len(lines), base_dir, ss, avail_width)
 
 
+#: Доля кегля, которую занимает знак моноширинного шрифта DejaVu Sans Mono.
+MONO_ADVANCE = 0.602
+CODE_SIZE_MAX, CODE_SIZE_MIN, CODE_SIZE_WRAPPED = 8.2, 5.4, 7.0
+
+
+def _wrap_code_line(line: str, limit: int) -> list:
+    """Строка кода длиннее limit знаков -> несколько строк.
+
+    Перенос ставится по пробелу; продолжение сдвигается на четыре знака
+    относительно начала строки, чтобы его было видно.
+    """
+    if len(line) <= limit:
+        return [line]
+    indent = len(line) - len(line.lstrip(" "))
+    prefix = " " * min(indent + 4, limit // 2)
+    out, rest = [], line
+    while len(rest) > limit:
+        cut = rest.rfind(" ", len(prefix) + 1, limit + 1)
+        if cut <= len(prefix):  # пробела нет — режем по ширине
+            cut = limit
+        out.append(rest[:cut].rstrip())
+        rest = prefix + rest[cut:].lstrip()
+    out.append(rest)
+    return out
+
+
 def _code_block(body, ss: StyleSheet1, avail_width: float) -> XPreformatted:
-    """Fenced-блок: кегль подбирается так, чтобы самые длинные строки влезали."""
-    text = "\n".join(body).rstrip("\n")
-    longest = max((len(ln) for ln in text.split("\n")), default=1)
-    size = min(8.2, (avail_width - 20) / max(longest * 0.602, 1.0))
-    size = max(size, 5.4)
+    """Fenced-блок: кегль подбирается так, чтобы самые длинные строки влезали.
+
+    Если строка не влезает даже самым мелким кеглем, блок набирается читаемым
+    кеглем, а длинные строки переносятся: иначе они уходят за поле страницы.
+    """
+    lines = "\n".join(body).rstrip("\n").split("\n")
+    longest = max((len(ln) for ln in lines), default=1)
+    room = avail_width - 20
+    size = min(CODE_SIZE_MAX, room / max(longest * MONO_ADVANCE, 1.0))
+    if size < CODE_SIZE_MIN:
+        size = CODE_SIZE_WRAPPED
+        limit = int(room / (MONO_ADVANCE * size))
+        lines = [part for ln in lines for part in _wrap_code_line(ln, limit)]
+    text = "\n".join(lines)
     style = ParagraphStyle(
         name="CodeAuto", parent=ss["Code"], fontSize=size, leading=size * 1.28
     )
