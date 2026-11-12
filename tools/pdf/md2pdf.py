@@ -418,6 +418,26 @@ class _DrawingWrapper(platypus.Flowable):
         self.drawing.drawOn(self.canv, 0, 0)
 
 
+def _svg_with_background(svg_text: str) -> str:
+    """Фон из style="background:…" корневого <svg> превращает в прямоугольник.
+
+    Браузер закрашивает таким фоном всю картинку, svglib его не видит — и
+    светлые подписи тёмных схем оказываются на белой бумаге. Прямоугольник на
+    весь viewBox возвращает схеме задуманный вид.
+    """
+    root = re.search(r"<svg\b[^>]*>", svg_text)
+    if not root:
+        return svg_text
+    tag = root.group(0)
+    color = re.search(r"background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8})", tag)
+    box = re.search(r'viewBox="\s*([-\d.]+)[\s,]+([-\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)\s*"', tag)
+    if not color or not box:
+        return svg_text
+    x, y, width, height = box.groups()
+    rect = f'<rect x="{x}" y="{y}" width="{width}" height="{height}" fill="{color.group(1)}"/>'
+    return svg_text[: root.end()] + rect + svg_text[root.end() :]
+
+
 def image_flowable(src: str, base_dir: str, max_width: float, ss: StyleSheet1):
     """Картинка по пути из Markdown. Возвращает flowable (или заглушку)."""
     path = src if os.path.isabs(src) else os.path.normpath(os.path.join(base_dir, src))
@@ -436,6 +456,7 @@ def image_flowable(src: str, base_dir: str, max_width: float, ss: StyleSheet1):
                 r'<text font-family="DocSvgSans"\1>',
                 svg_text,
             )
+            patched = _svg_with_background(patched)
             tmp_path = path
             if patched != svg_text:
                 tmp_path = path + ".svgfont.tmp"
