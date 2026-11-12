@@ -7,10 +7,17 @@
 
 > Мост `module_bridge_node` в `ros2_ws/` собран под **бинарный** протокол
 > 10/16 байт, которого в железе нет. Реальная прошивка
-> ([`firmware/motor_wheel`](../firmware/motor_wheel/motor_wheel.ino), **fw25**)
+> ([`firmware/motor_wheel`](../firmware/motor_wheel/motor_wheel.ino), **fw26**)
 > общается **текстовыми строками** по USB на каждое колесо. Актуальный протокол —
 > [`SERIAL_PROTOCOL.md`](SERIAL_PROTOCOL.md); §10 ниже показывает, что именно
 > нужно заменить в `module_link.py`, чтобы ROS 2-стек заработал с настоящими платами.
+>
+> **На роботе этот стек не запущен.** Работает бортовое ПО
+> [Zapret](https://github.com/danilka-revin/Zapret): своя карта занятости по
+> лидару LDS-01, свой планировщик маршрута, без Nav2. Из ROS 2 там используется
+> только драйвер лидара, публикующий `/scan`. Распознавания знаков и светофора в
+> рабочем ПО нет. Документ ниже описывает справочную архитектуру пакетов
+> `ros2_ws/`; что уточнено по Zapret — [`ZAPRET_SYNC.md`](ZAPRET_SYNC.md).
 
 ---
 
@@ -25,7 +32,7 @@
 │  УРОВЕНЬ 3. НАВИГАЦИЯ И ВОСПРИЯТИЕ                                         │
 │  Nav2 (планирование, recovery), slam_toolbox (SLAM), AMCL (локализация),   │
 │  rus_slam_perception: camera_node, sign_detector_node, traffic_light_node  │
-│  rus_slam_lidar: lds01_driver_node (Лидар LDC 01 -> LaserScan)             │
+│  rus_slam_lidar: lds01_driver_node (Лидар LDS-01 -> LaserScan)             │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  УРОВЕНЬ 2. УПРАВЛЕНИЕ ДВИЖЕНИЕМ                                           │
 │  rus_slam_base: crab_drive_node (обратная кинематика 4WIS/4WID),           │
@@ -34,9 +41,10 @@
 │  УРОВЕНЬ 1. МОСТ ОБЩЕНИЯ С ЖЕЛЕЗОМ (требует доработки)                     │
 │  rus_slam_base: module_bridge_node (4× USB 115200, текстовые кадры, CRC16) │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  УРОВЕНЬ 0. МИКРОКОНТРОЛЛЕРЫ (4×)                                          │
-│  firmware/motor_wheel (fw25): Mega 2560 + TB6600 + драйвер ZS-Z11H,        │
-│  текстовый протокол @F/@TLM по USB, один кабель на колесо                   │
+│  УРОВЕНЬ 0. МИКРОКОНТРОЛЛЕРЫ (5×)                                          │
+│  firmware/motor_wheel (fw26), 4 платы: Mega 2560 + TB6600 + ZS-Z11H,       │
+│  текстовый протокол @F/@TLM по USB, один кабель на колесо;                 │
+│  firmware/sensor_module, 1 плата: свет, замок отсека, карты, GY-87         │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -49,7 +57,7 @@
 | `rus_slam_interfaces` | ament_cmake (rosidl) | Пользовательские сообщения/сервисы: команды колес, состояние модулей, АКБ, знаки, светофор, хоминг |
 | `rus_slam_base` | ament_python | Ядро: протокол обмена, кинематика, мост UART, одометрия, TF |
 | `rus_slam_description` | ament_python | URDF/Xacro модель робота + `robot_state_publisher` |
-| `rus_slam_lidar` | ament_python | Драйвер Лидара LDC 01 (UART -> `sensor_msgs/LaserScan`) |
+| `rus_slam_lidar` | ament_python | Драйвер Лидара LDS-01 (UART -> `sensor_msgs/LaserScan`) |
 | `rus_slam_perception` | ament_python | Камера, детекция знаков («Стоп», «Пешеходный переход», «Искусственная неровность») и светофоров |
 | `rus_slam_navigation` | ament_python | Конфиги и лаунчеры: slam_toolbox, Nav2, AMCL |
 | `rus_slam_safety` | ament_python | Безопасность (гейт `/cmd_vel`, вотчдог, АКБ) и менеджер миссии (FSM) |
@@ -93,7 +101,7 @@ sudo apt install -y python3-serial python3-opencv \
                                │        └──► safety_node
                                └──► /battery (BatteryInfo) ──► safety_node
 
-  [Лидар LDC 01] ──UART──► lds01_driver_node ──► /scan ──► slam_toolbox / Nav2 costmaps
+  [Лидар LDS-01] ──UART──► lds01_driver_node ──► /scan ──► slam_toolbox / Nav2 costmaps
   [Камера] ──► camera_node ──► /camera/image_raw ──► sign_detector_node ──► /perception/signs
                                                      traffic_light_node ──► /perception/traffic_light
   mission_manager_node: FSM миссии, клиент действия NavigateToPose,
@@ -281,12 +289,12 @@ v_i  = hypot(vx_i, vy_i);  θ_i = atan2(vy_i, vx_i)
 
 `rus_slam_base/module_link.py` — единственное место в ROS 2-стеке, которое
 трогает порт. Сейчас там `serial.Serial(...)` + `protocol.py` с бинарными
-кадрами. Чтобы стек заработал с fw25, нужно заменить три вещи, не меняя
+кадрами. Чтобы стек заработал с fw26, нужно заменить три вещи, не меняя
 остальные узлы (топики `/wheel_commands`, `/modules/state`, `/battery` остаются):
 
-| Что | Сейчас | Должно быть (fw25) |
+| Что | Сейчас | Должно быть (fw26) |
 | :--- | :--- | :--- |
-| Транспорт | 10/16-байтные кадры, поиск `0xBB 0x44` | построчное чтение до `\n`, разбор `@F` / `@TLM` |
+| Транспорт | 10/16-байтные кадры, поиск `0xBB 0x44` | построчное чтение до `\n`, разбор `@F` / `@TLM`; в fw26 кадр `@F` — 22 слова, последнее перед CRC — измеренный угол `pa` |
 | Команда руля | `STEER_CDEG` (i16) | `w <XX> <угол>` — угол в градусах, предел **±100°**, нужен ноль |
 | Команда тяги | `TRACTION_PWM` −1000…+1000 | `v <0…150> [f/b]` — прямое значение `Servo.write`, heartbeat чаще 650 мс |
 | Включение | `FLAG_ENABLE` | отдельного флага нет: ненулевое `v`/`t` само разрешает выходы |
