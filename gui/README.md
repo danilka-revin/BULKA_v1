@@ -2,7 +2,16 @@
 > `0xBB 0x44`, которых прошивка не выдаёт: реальный протокол — текстовый
 > (`@F`/`@TLM`, см. [`../docs/SERIAL_PROTOCOL.md`](../docs/SERIAL_PROTOCOL.md)).
 
-# Пульт RUS SLAM
+# Пульт BULKA_v1 — справочная копия интерфейса
+
+> **Что это.** Справочная копия интерфейса и независимый сервер данных
+> `gui/backend.py` (источники `sim` / `serial` / `ros`). **Рабочий** веб-пульт и
+> бортовой экран робота живут в
+> [danilka-revin/Zapret](https://github.com/danilka-revin/Zapret)
+> (`slam_gui/`, `robot_control/`): три интерфейса — пульт 8080, киоск 8090 и
+> инженерный пульт `/console`. Как они выглядят и чем отличаются от этой копии —
+> [`../docs/GUI.md`](../docs/GUI.md), [`../docs/MAIN_SCREEN.md`](../docs/MAIN_SCREEN.md),
+> раздел 9, и [`../docs/ZAPRET_SYNC.md`](../docs/ZAPRET_SYNC.md).
 
 Веб-панель управления роботом-курьером 4WIS/4WID в визуальном языке [ZMK Vision](https://github.com/danilka-revin/zmk-videoanalytics): тёмный сайдбар `#101b17`, акцент `#d5ff45`, светлая рабочая зона `#f3f5f7`.
 

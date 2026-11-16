@@ -1,4 +1,9 @@
-# Автономный робот-курьер с крабовым ходом (4WIS / 4WID) для НТЦ АО «АВТОВАЗ»
+# BULKA_v1 — автономный робот-курьер с крабовым ходом (4WIS / 4WID) для НТЦ АО «АВТОВАЗ»
+
+> **BULKA_v1** — имя робота в бортовом ПО и на всех экранах (так его подписывает
+> [danilka-revin/Zapret](https://github.com/danilka-revin/Zapret) начиная с
+> коммита `7e8fa51` от 16.11.2026). В документации используются оба названия:
+> BULKA_v1 — интерфейс и софт, «робот-курьер 4WIS/4WID» — изделие.
 
 [![ROS 2](https://img.shields.io/badge/ROS_2-Humble%20%7C%20Jazzy-blue.svg)](https://docs.ros.org/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04%20%7C%2026.04%20LTS-E95420.svg)](https://ubuntu.com/)
@@ -83,19 +88,19 @@ python3 tools/estimate/build_estimate.py --rate 85  # показать итог�
 | 📘 **Полный технический паспорт** | Инженерные расчеты прочности рамы под 250 кг, редуктора GT2 150/20, ступиц Subaru, АКБ | [`docs/TECHNICAL_SPECIFICATION.md`](docs/TECHNICAL_SPECIFICATION.md) | [`PDF`](docs/pdf/TECHNICAL_SPECIFICATION.pdf) |
 | 📑 **Пояснительная записка по регламенту** | Пояснительная записка по критериям задания № 2 (экономика, сравнение с 3 аналогами, методика тестов) | [`docs/EXPLANATORY_NOTE_AVTOVAZ.md`](docs/EXPLANATORY_NOTE_AVTOVAZ.md) | [`PDF`](docs/pdf/EXPLANATORY_NOTE_AVTOVAZ.pdf) |
 | 💰 **Смета на изготовление** | 64 позиции с фотографиями, количеством, ценой в рублях и долларах США и ссылками на продавцов; итог **369 170,85 ₽ (4 461,09 USD)** | [`docs/COST_ESTIMATE.md`](docs/COST_ESTIMATE.md) | [`PDF`](docs/pdf/COST_ESTIMATE.pdf) |
-| 🔄 **Синхронизация с Zapret** | Что перенесено из бортового ПО: fw26, модуль датчиков, фактический состав робота; какие расхождения остались | [`docs/ZAPRET_SYNC.md`](docs/ZAPRET_SYNC.md) | [`PDF`](docs/pdf/ZAPRET_SYNC.pdf) |
+| 🔄 **Синхронизация с Zapret** | Сверка на коммите `71a7c26` (16.11.2026): пульт v2, доставка по векторной карте, автокалибровка, установщик Python, имя BULKA_v1; что перенесено и какие расхождения остались | [`docs/ZAPRET_SYNC.md`](docs/ZAPRET_SYNC.md) | [`PDF`](docs/pdf/ZAPRET_SYNC.pdf) |
 | ⚡ **Электрические схемы и подключения** | Распиновка Mega (D2–D8, D18, D19, A0), TB6600, драйвер тяги ZS-Z11H, питание и предохранители | [`docs/ELECTRICAL_AND_PINOUTS.md`](docs/ELECTRICAL_AND_PINOUTS.md) | [`PDF`](docs/pdf/ELECTRICAL_AND_PINOUTS.pdf) |
 | 💻 **Прошивка микроконтроллеров** | `motor_wheel` **fw26**: 4 платы Mega 2560/Mega Mini, по одному USB на колесо, роль в CRC-телеметрии, калибровка по оптодатчику и потенциометру, активное удержание угла, сохранённый полный ноль, команды тяги и руля. `sensor_module` **протокол 4**: пятая плата — свет, замок отсека, карты доступа, компас | [`firmware/README.md`](firmware/README.md) · [`motor_wheel.ino`](firmware/motor_wheel/motor_wheel.ino) · [`sensor_module.ino`](firmware/sensor_module/sensor_module.ino) | — |
 | 🧪 **Проверка прошивки без железа** | Хост-симуляция четырёх плат колёс (TB6600, оптодатчик, потенциометр, EEPROM) — 61 сценарий; симуляция модуля датчиков (GY-87, RC522, лента, реле, замок) — 20 сценариев; сборка avr-gcc без Arduino IDE | [`firmware/firmware_sim/`](firmware/firmware_sim/sim.cpp) · [`sensor_sim.cpp`](firmware/firmware_sim/sensor_sim.cpp) · [`firmware/tools/avr_build.py`](firmware/tools/avr_build.py) | — |
 | 📐 **Эталонный скетч руля** | Проверенный на реальной механике скетч, с которым сверяются пины, уровни и скорости | [`firmware/reference/`](firmware/reference/steering_tested/steering_tested.ino) | — |
 | 🎛 **Печатная плата модуля (PCB)** | Инженерный архив v1.0: BOM, Netlist, распиновки, гайд. **Пины не совпадают с прошивкой колеса** — см. [`pcb/STATUS.md`](pcb/STATUS.md) | [`pcb/`](pcb/README.md) | — |
-| 🧠 **Архитектура ПО (ROS 2)** | Справочная архитектура: пакеты, узлы, топики, дерево TF, режимы запуска. Рабочий софт — в Zapret | [`docs/SOFTWARE_ARCHITECTURE.md`](docs/SOFTWARE_ARCHITECTURE.md) | [`PDF`](docs/pdf/SOFTWARE_ARCHITECTURE.pdf) |
+| 🧠 **Архитектура ПО** | Раздел 0 — рабочая архитектура бортового ПО (два процесса Flask, модули `robot_control`, поток данных, где живёт состояние); разделы 1–10 — справочная архитектура ROS 2 | [`docs/SOFTWARE_ARCHITECTURE.md`](docs/SOFTWARE_ARCHITECTURE.md) | [`PDF`](docs/pdf/SOFTWARE_ARCHITECTURE.pdf) |
 | 🔗 **Причинно-следственная карта** | Сквозные связи «требование → железо → прошивка → ROS → навигация/GUI», разрывы интеграции и проверенные ограничения | [`docs/CAUSAL_MAP.md`](docs/CAUSAL_MAP.md) | [`PDF`](docs/pdf/CAUSAL_MAP.pdf) |
 | 🔌 **Протокол обмена** | Текстовые команды и кадры `@F`/`@TLM`/`@Z` плат колёс (fw26, поле `pa`), кадры `@S`/`@CARD`/`@EVT`/`@ACK` модуля датчиков, CRC16/Modbus, таймауты | [`docs/SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md) | [`PDF`](docs/pdf/SERIAL_PROTOCOL.pdf) |
 | 🤖 **Пакеты ROS 2** | Справочно: кинематика, мост модулей, одометрия, лидар, восприятие, навигация, безопасность, запуск. Для реального железа требуется доработка моста | [`ros2_ws/README.md`](ros2_ws/README.md) | — |
-| 🖥 **GUI — пульт робота** | Справочно: веб-пульт, карта SLAM, окно камеры. Рабочий пульт — в Zapret | [`gui/`](gui/README.md) · [`docs/GUI.md`](docs/GUI.md) | [`PDF`](docs/pdf/GUI.pdf) |
-| 🖥 **Основной экран робота** | Справочно: киоск, 4 двигателя, АКБ, PIN и грузовой отсек; нативное Tkinter-приложение | [`gui/native_display.py`](gui/native_display.py) · [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) · [`docs/RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
-| 🔐 **Сервисный пульт (окно «Сервис»)** | Справочно: ячейка хранения по PIN/QR/RFID с аудитом, ручная подача команд двигателю (строка протокола), панель АКБ 12S3P, статистика рейсов | [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) · [`gui/console-core.js`](gui/console-core.js) | [`PDF`](docs/pdf/SERVICE_CONSOLE.pdf) |
+| 🖥 **GUI — веб-пульт и интерфейсы** | Три интерфейса BULKA_v1 с настоящими скриншотами: пульт 8080 (телеметрия, лидар 360°, камеры), 12 страниц (устройства, датчики, АКБ, руление, карта, скан, навигация, доставка), инженерный пульт `/console` | [`docs/GUI.md`](docs/GUI.md) · [`gui/README.md`](gui/README.md) | [`PDF`](docs/pdf/GUI.pdf) |
+| 📟 **Бортовой экран робота (киоск)** | Экран 8090 в разрешении дисплея 1920 × 1080: АКБ, шасси, обзор датчиков; свайпы «тяга и руление» и «камеры и логи»; панель «Функции»; PIN только для отсека; справочный нативный экран Tkinter | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) · [`gui/native_display.py`](gui/native_display.py) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
+| 🔐 **Сервисный пульт (окно «Сервис»)** | Вкладка «Сервис» инженерного пульта: ячейка хранения по PIN/QR/RFID с аудитом, ручная подача команд двигателю, АКБ 12S3P, статистика рейсов; режим симуляции и расхождение с текстовым протоколом fw26 | [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) · [`gui/console-core.js`](gui/console-core.js) | [`PDF`](docs/pdf/SERVICE_CONSOLE.pdf) |
 
 ### Тесты прошивки без железа
 
@@ -148,9 +153,9 @@ rus_slam/
 │   ├── pdf/                   готовые PDF-копии тех же 12 документов
 │   ├── estimate/              таблицы сметы: состав, цены, источники фото
 │   └── assets/
-│       ├── images/            14 иллюстраций, вставленных в документы
+│       ├── images/            17 иллюстраций и схем, вставленных в документы
 │       ├── estimate/          61 фотография позиций сметы
-│       └── screens/           9 настоящих скриншотов пульта и экрана робота
+│       └── screens/           26 настоящих скриншотов пульта, киоска и консоли
 ├── firmware/                  прошивка пяти плат (главное содержимое)
 │   ├── README.md              руководство по прошивке: fw26 и модуль датчиков
 │   ├── motor_wheel/           боевой скетч колеса motor_wheel.ino
@@ -188,11 +193,11 @@ rus_slam/
 | Электрические схемы и распиновка | [`ELECTRICAL_AND_PINOUTS.md`](docs/ELECTRICAL_AND_PINOUTS.md) | [`PDF`](docs/pdf/ELECTRICAL_AND_PINOUTS.pdf) |
 | Протокол обмена с платами | [`SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md) | [`PDF`](docs/pdf/SERIAL_PROTOCOL.pdf) |
 | Причинно-следственная карта | [`CAUSAL_MAP.md`](docs/CAUSAL_MAP.md) | [`PDF`](docs/pdf/CAUSAL_MAP.pdf) |
-| Архитектура ПО (ROS 2) | [`SOFTWARE_ARCHITECTURE.md`](docs/SOFTWARE_ARCHITECTURE.md) | [`PDF`](docs/pdf/SOFTWARE_ARCHITECTURE.pdf) |
-| Веб-пульт и карта SLAM | [`GUI.md`](docs/GUI.md) | [`PDF`](docs/pdf/GUI.pdf) |
-| Основной экран робота | [`MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
+| Архитектура ПО (рабочая + ROS 2) | [`SOFTWARE_ARCHITECTURE.md`](docs/SOFTWARE_ARCHITECTURE.md) | [`PDF`](docs/pdf/SOFTWARE_ARCHITECTURE.pdf) |
+| Веб-пульт, киоск и инженерный пульт | [`GUI.md`](docs/GUI.md) | [`PDF`](docs/pdf/GUI.pdf) |
+| Бортовой экран робота (киоск) | [`MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
 | Сервисный пульт | [`SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) | [`PDF`](docs/pdf/SERVICE_CONSOLE.pdf) |
-| Запуск и доступ к роботу | [`RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) | [`PDF`](docs/pdf/RUN_AND_ACCESS.pdf) |
+| Запуск, доступ, учётки и PIN | [`RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) | [`PDF`](docs/pdf/RUN_AND_ACCESS.pdf) |
 
 `COST_ESTIMATE.md` руками не правят: его собирает
 [`tools/estimate/build_estimate.py`](tools/estimate/build_estimate.py) из таблиц
@@ -215,24 +220,52 @@ rus_slam/
 [`subaru_hub_bearing.jpg`](docs/assets/images/subaru_hub_bearing.jpg),
 [`swerve_drive_chassis.png`](docs/assets/images/swerve_drive_chassis.png),
 [`system_architecture.svg`](docs/assets/images/system_architecture.svg),
-[`tb6600_driver.jpg`](docs/assets/images/tb6600_driver.jpg).
+[`tb6600_driver.jpg`](docs/assets/images/tb6600_driver.jpg),
+[`ui_topology.svg`](docs/assets/images/ui_topology.svg) (пульт, киоск и оборудование),
+[`ui_screens.svg`](docs/assets/images/ui_screens.svg) (карта экранов и адресов),
+[`delivery_flow.svg`](docs/assets/images/delivery_flow.svg) (четыре шага сухого прогона).
 
 ### 🖼 Скриншоты интерфейсов `docs/assets/screens/`
 
-Сняты с работающего сервера (`python3 gui/backend.py --port 8080 --source sim`),
-браузер 1600×1000 — не макеты и не рендеры.
+**Настоящие снимки работающей программы**, а не макеты: подняты оба процесса
+бортового ПО (`scripts/preview_remote.py`), вход выполнен оператором, страницы
+открыты в Chromium 153. Пульт и внутренние страницы — 1600 × 1000, бортовой
+экран — 1920 × 1080 (дисплей робота). Снято на коммите Zapret `71a7c26` от
+16.11.2026; как повторить — [`docs/ZAPRET_SYNC.md`](docs/ZAPRET_SYNC.md), §4.
 
 | Скриншот | Что на нём | Где описан |
 | :--- | :--- | :--- |
-| [`main-screen.png`](docs/assets/screens/main-screen.png) | основной экран робота: 4 модуля, АКБ, грузовой отсек | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) · [`docs/RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) |
-| [`console-dashboard.png`](docs/assets/screens/console-dashboard.png) | пульт: метрики, карта SLAM, программа доставки, камеры, телеоперация | [`docs/GUI.md`](docs/GUI.md) |
-| [`console-light.png`](docs/assets/screens/console-light.png) | тот же пульт в светлой теме | [`docs/GUI.md`](docs/GUI.md) |
+| [`pult-dashboard.png`](docs/assets/screens/pult-dashboard.png) | **веб-пульт** BULKA_v1: АКБ, шасси, лидар 360°, камеры, журнал | [`docs/GUI.md`](docs/GUI.md) · [`docs/RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) |
+| [`pult-summary.png`](docs/assets/screens/pult-summary.png) | «Сводка»: рейсы, энергия, журнал событий | [`docs/GUI.md`](docs/GUI.md) |
+| [`login.png`](docs/assets/screens/login.png) | вход оператора | [`docs/RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) |
+| [`devices-ports.png`](docs/assets/screens/devices-ports.png) | 12 ролей и ручное назначение портов | [`docs/GUI.md`](docs/GUI.md) |
+| [`sensors-module.png`](docs/assets/screens/sensors-module.png) | модуль датчиков: замок, карты, компас, барометр, свет | [`docs/GUI.md`](docs/GUI.md) |
+| [`connections.png`](docs/assets/screens/connections.png) | подключения: USB, сеть, Bluetooth | [`docs/GUI.md`](docs/GUI.md) |
+| [`battery-bms.png`](docs/assets/screens/battery-bms.png) | АКБ 12S3P: банки, защиты, CSV | [`docs/GUI.md`](docs/GUI.md) |
+| [`controls-steer.png`](docs/assets/screens/controls-steer.png) | руление и тяга: восемь режимов, калибровка | [`docs/GUI.md`](docs/GUI.md) |
+| [`map-lidar.png`](docs/assets/screens/map-lidar.png) | карта лидара: сетка занятости, настройки | [`docs/GUI.md`](docs/GUI.md) |
+| [`scan-mode.png`](docs/assets/screens/scan-mode.png) | режим «Скан»: карта и управление | [`docs/GUI.md`](docs/GUI.md) |
+| [`navigation.png`](docs/assets/screens/navigation.png) | навигация: цель, маршрут, поездка | [`docs/GUI.md`](docs/GUI.md) |
+| [`delivery-dryrun.png`](docs/assets/screens/delivery-dryrun.png) | доставка: маршрут по графу, объекты ПДД, сухой прогон | [`docs/GUI.md`](docs/GUI.md) |
+| [`kiosk-main.png`](docs/assets/screens/kiosk-main.png) | **бортовой экран** 1920 × 1080: АКБ, шасси, обзор датчиков | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) |
+| [`kiosk-functions.png`](docs/assets/screens/kiosk-functions.png) | панель «Функции»: отсек, темы, карта | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) |
+| [`kiosk-functions-panel.png`](docs/assets/screens/kiosk-functions-panel.png) | панель «Функции» крупным планом | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) |
+| [`kiosk-battery.png`](docs/assets/screens/kiosk-battery.png) | АКБ на борту: подключение BMS и печать отчёта | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) |
+| [`kiosk-steer.png`](docs/assets/screens/kiosk-steer.png) | свайп «Тяга и руление» | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) |
+| [`kiosk-cameras.png`](docs/assets/screens/kiosk-cameras.png) | свайп «Камеры и логи» | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) |
+| [`kiosk-map.png`](docs/assets/screens/kiosk-map.png) | карта лидара на бортовом экране | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) |
+| [`console-dash.png`](docs/assets/screens/console-dash.png) | инженерный пульт `/console`, вкладка «Пульт» | [`docs/GUI.md`](docs/GUI.md) · [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) |
 | [`console-drive.png`](docs/assets/screens/console-drive.png) | вкладка «Ходовая»: 4 модуля 4WIS/4WID | [`docs/GUI.md`](docs/GUI.md) |
 | [`console-mission.png`](docs/assets/screens/console-mission.png) | вкладка «Миссия»: FSM доставки | [`docs/GUI.md`](docs/GUI.md) |
 | [`console-sensors.png`](docs/assets/screens/console-sensors.png) | вкладка «Сенсоры»: радар лидара, детекции | [`docs/GUI.md`](docs/GUI.md) |
 | [`console-safety.png`](docs/assets/screens/console-safety.png) | вкладка «Безопасность»: E-stop, вотчдог, АКБ, CRC | [`docs/GUI.md`](docs/GUI.md) |
 | [`console-logs.png`](docs/assets/screens/console-logs.png) | вкладка «Журнал»: события пульта | [`docs/GUI.md`](docs/GUI.md) |
-| [`console-service.png`](docs/assets/screens/console-service.png) | вкладка «Сервис»: замок, двигатели, АКБ, статистика | [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) |
+| [`console-service.png`](docs/assets/screens/console-service.png) | вкладка «Сервис»: замок, ручная подача команд, АКБ, статистика | [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) |
+
+Инженерный пульт на снимках работает **в режиме симуляции** («Режим: TELEOP ·
+симуляция», «UART ×4 · симуляция · 20 Гц»): его числа АКБ и модулей —
+синтетические. Пустые карточки шасси на веб-пульте — тоже честный ответ: на
+стенде нет плат, и пульт пишет «нет связи» вместо демонстрационных значений.
 
 ### ⚙️ Прошивка `firmware/`
 
@@ -525,13 +558,14 @@ python3 gui/tests/main.api.test.js     # 19 сквозных: экран ↔ ж�
 
 Как это выглядит — скриншоты с работающего сервера:
 
-| Пульт управления | Основной экран робота |
+| Веб-пульт оператора (8080) | Бортовой экран робота (8090) |
 | :---: | :---: |
-| [![Пульт управления](docs/assets/screens/console-dashboard.png)](docs/assets/screens/console-dashboard.png) | [![Основной экран робота](docs/assets/screens/main-screen.png)](docs/assets/screens/main-screen.png) |
+| [![Веб-пульт BULKA_v1](docs/assets/screens/pult-dashboard.png)](docs/assets/screens/pult-dashboard.png) | [![Бортовой экран BULKA_v1](docs/assets/screens/kiosk-main.png)](docs/assets/screens/kiosk-main.png) |
 
-Остальные вкладки пульта («Ходовая», «Миссия», «Сенсоры», «Безопасность»,
-«Журнал», «Сервис») — в [`docs/GUI.md`](docs/GUI.md), §1.1, и в
-[`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md), §8.
+Остальные экраны — «Сводка», «Устройства», «Датчики», «АКБ», «Руление и тяга»,
+«Карта», «Скан», «Навигация», «Доставка» — в [`docs/GUI.md`](docs/GUI.md);
+свайп-экраны киоска и панель «Функции» — в [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md);
+инженерный пульт и окно «Сервис» — в [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md).
 
 Окно **«Сервис»** (вкладка в сайдбаре) закрывает требования задания № 2 по
 защите груза: доступ к ячейке хранения по PIN (заводской `2580`; 5 неудачных

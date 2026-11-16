@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" style="background:#0f172a; font-family:'Segoe UI',Roboto,sans-serif;">
+  <defs>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#22c55e"/>
+    </marker>
+  </defs>
+
+  <text x="500" y="32" fill="#f8fafc" font-size="19" font-weight="bold" text-anchor="middle">Два интерфейса BULKA_v1: веб-пульт 8080, бортовой экран 8090 и оборудование по USB</text>
+  <text x="500" y="55" fill="#94a3b8" font-size="12" text-anchor="middle">Один и тот же код robot_control, два процесса Flask, пять плат Arduino и датчики; порты задаёт оператор вручную</text>
+
+  <!-- Column 1: operator -->
+  <rect x="18" y="80" width="196" height="150" rx="9" fill="url(#card)" stroke="#475569" stroke-width="1.4"/>
+  <text x="116" y="104" fill="#e2e8f0" font-size="13" font-weight="bold" text-anchor="middle">Оператор</text>
+  <text x="32" y="126" fill="#cbd5e1" font-size="11">телефон, планшет, ноутбук</text>
+  <text x="32" y="146" fill="#cbd5e1" font-size="11">Wi-Fi робота (точка доступа)</text>
+  <text x="32" y="166" fill="#cbd5e1" font-size="11">браузер, без установки</text>
+  <text x="32" y="186" fill="#94a3b8" font-size="11">http://&lt;IP-робота&gt;:8080</text>
+  <text x="32" y="210" fill="#fbbf24" font-size="11">вход: логин и пароль</text>
+
+  <!-- Column 2: remote -->
+  <rect x="248" y="80" width="330" height="270" rx="9" fill="url(#card)" stroke="#38bdf8" stroke-width="1.8"/>
+  <rect x="248" y="80" width="330" height="26" rx="9" fill="#0284c7" opacity="0.28"/>
+  <text x="413" y="98" fill="#7dd3fc" font-size="13" font-weight="bold" text-anchor="middle">8080 · ВЕБ-ПУЛЬТ «ПУЛЬТ»</text>
+  <text x="262" y="126" fill="#e2e8f0" font-size="11">Flask, сессия оператора, CSRF-токен</text>
+  <text x="262" y="145" fill="#cbd5e1" font-size="11">/ — пульт: АКБ, шасси, лидар, камеры</text>
+  <text x="262" y="163" fill="#cbd5e1" font-size="11">/devices · /sensors · /connections</text>
+  <text x="262" y="181" fill="#cbd5e1" font-size="11">/battery · /controls · /map · /scan</text>
+  <text x="262" y="199" fill="#cbd5e1" font-size="11">/navigation · /delivery</text>
+  <text x="262" y="217" fill="#cbd5e1" font-size="11">/console — инженерный пульт (табы)</text>
+  <text x="262" y="243" fill="#fbbf24" font-size="11">E-STOP и «Остановить всё» в шапке</text>
+  <text x="262" y="263" fill="#94a3b8" font-size="11">порт открыт только в локальной сети</text>
+  <rect x="262" y="278" width="302" height="56" rx="6" fill="#0b1220" stroke="#1e40af"/>
+  <text x="272" y="296" fill="#93c5fd" font-size="10">Каждая команда проверяется на борту</text>
+  <text x="272" y="312" fill="#93c5fd" font-size="10">Движение — только пока кнопка удерживается</text>
+  <text x="272" y="328" fill="#93c5fd" font-size="10">Потеря фокуса или телеметрии — тормоз</text>
+
+  <!-- Column 3: kiosk -->
+  <rect x="614" y="80" width="368" height="270" rx="9" fill="url(#card)" stroke="#f43f5e" stroke-width="1.8"/>
+  <rect x="614" y="80" width="368" height="26" rx="9" fill="#9f1239" opacity="0.35"/>
+  <text x="798" y="98" fill="#fda4af" font-size="13" font-weight="bold" text-anchor="middle">8090 · БОРТОВОЙ ЭКРАН (КИОСК)</text>
+  <text x="628" y="126" fill="#e2e8f0" font-size="11">Flask-киоск, дисплей робота, чёрно-красная тема</text>
+  <text x="628" y="145" fill="#cbd5e1" font-size="11">/kiosk · /robot.html — телеметрия и свайпы</text>
+  <text x="628" y="163" fill="#cbd5e1" font-size="11">свайп вправо — тяга и руление</text>
+  <text x="628" y="181" fill="#cbd5e1" font-size="11">свайп влево — камеры и журнал</text>
+  <text x="628" y="199" fill="#cbd5e1" font-size="11">кнопки «Карта», «Навигация», «Доставка»</text>
+  <text x="628" y="217" fill="#cbd5e1" font-size="11">«Функции»: отсек, темы, сброс карты</text>
+  <text x="628" y="243" fill="#fbbf24" font-size="11">PIN 7232 — только для грузового отсека</text>
+  <text x="628" y="263" fill="#94a3b8" font-size="11">тяга на борту — ползунок Servo 0–150</text>
+  <rect x="628" y="278" width="340" height="56" rx="6" fill="#1a0b12" stroke="#7f1d1d"/>
+  <text x="638" y="296" fill="#fca5a5" font-size="10">Владелец USB-портов — только бортовой процесс</text>
+  <text x="638" y="312" fill="#fca5a5" font-size="10">Веб-пульт пересылает команды сюда и не открывает</text>
+  <text x="638" y="328" fill="#fca5a5" font-size="10">второй драйвер: порт занят одним владельцем</text>
+
+  <!-- Arrows between apps -->
+  <line x1="214" y1="150" x2="246" y2="150" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="230" y="140" fill="#7dd3fc" font-size="9" text-anchor="middle">HTTP</text>
+  <path d="M580 168 L612 168" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="596" y="160" fill="#7dd3fc" font-size="9" text-anchor="middle">API</text>
+  <path d="M612 196 L580 196" stroke="#22c55e" stroke-width="2" marker-end="url(#arrG)"/>
+  <text x="596" y="212" fill="#4ade80" font-size="9" text-anchor="middle">скан</text>
+
+  <!-- Hardware band -->
+  <rect x="18" y="372" width="964" height="196" rx="9" fill="#0b1220" stroke="#1e293b" stroke-width="1.2"/>
+  <text x="500" y="394" fill="#94a3b8" font-size="12" font-weight="bold" text-anchor="middle">ОБОРУДОВАНИЕ: USB-ХАБ, ТЕКСТОВЫЕ ПРОТОКОЛЫ С CRC16, ПОРТЫ НАЗНАЧАЕТ ОПЕРАТОР</text>
+
+  <!-- Wheels -->
+  <rect x="34" y="410" width="300" height="142" rx="7" fill="url(#card)" stroke="#60a5fa" stroke-width="1.3"/>
+  <text x="184" y="430" fill="#93c5fd" font-size="12" font-weight="bold" text-anchor="middle">4 платы колёс · motor_wheel fw26</text>
+  <text x="46" y="450" fill="#e2e8f0" font-size="10">FL · FR · RL · RR — четыре USB-кабеля</text>
+  <text x="46" y="468" fill="#e2e8f0" font-size="10">кадры @F / @TLM / @Z, роль в телеметрии</text>
+  <text x="46" y="486" fill="#e2e8f0" font-size="10">TB6600 — руль, ZS-Z11H — тяга Servo</text>
+  <text x="46" y="504" fill="#e2e8f0" font-size="10">оптодатчик D18, потенциометр A0</text>
+  <text x="46" y="522" fill="#e2e8f0" font-size="10">watchdog 650 мс, EEPROM: ноль и наклон</text>
+  <text x="46" y="540" fill="#fbbf24" font-size="10">роль подтверждается только телеметрией</text>
+
+  <!-- Sensor module -->
+  <rect x="346" y="410" width="236" height="142" rx="7" fill="url(#card)" stroke="#2dd4bf" stroke-width="1.3"/>
+  <text x="464" y="430" fill="#5eead4" font-size="12" font-weight="bold" text-anchor="middle">Модуль датчиков · протокол 4</text>
+  <text x="358" y="450" fill="#e2e8f0" font-size="10">пятая плата, свой USB</text>
+  <text x="358" y="468" fill="#e2e8f0" font-size="10">GY-87: компас и барометр</text>
+  <text x="358" y="486" fill="#e2e8f0" font-size="10">RC522: карты доступа, до 12</text>
+  <text x="358" y="504" fill="#e2e8f0" font-size="10">4 реле света, лента 73 LED</text>
+  <text x="358" y="522" fill="#e2e8f0" font-size="10">замок отсека — сервопривод</text>
+  <text x="358" y="540" fill="#e2e8f0" font-size="10">кадры @S / @CARD / @EVT / @ACK</text>
+
+  <!-- Sensors column -->
+  <rect x="594" y="410" width="372" height="142" rx="7" fill="url(#card)" stroke="#f59e0b" stroke-width="1.3"/>
+  <text x="780" y="430" fill="#fbbf24" font-size="12" font-weight="bold" text-anchor="middle">Датчики и периферия</text>
+  <text x="606" y="450" fill="#e2e8f0" font-size="10">лидар LDS-01 (LDS-02, RPLIDAR, LD06) — 360°</text>
+  <text x="606" y="468" fill="#e2e8f0" font-size="10">4 камеры Logitech C930e — круговой обзор</text>
+  <text x="606" y="486" fill="#e2e8f0" font-size="10">Kinect 360 — карта глубины 3D</text>
+  <text x="606" y="504" fill="#e2e8f0" font-size="10">BMS JBD 12S3P — 9600 8N1, только чтение</text>
+  <text x="606" y="522" fill="#e2e8f0" font-size="10">USB-UART чекового принтера</text>
+  <text x="606" y="540" fill="#94a3b8" font-size="10">путь порта — подтверждение, а не доказательство</text>
+
+  <!-- Files band -->
+  <rect x="18" y="586" width="964" height="96" rx="9" fill="url(#card)" stroke="#475569" stroke-width="1.2"/>
+  <text x="500" y="608" fill="#e2e8f0" font-size="12" font-weight="bold" text-anchor="middle">ЧТО ХРАНИТСЯ НА ДИСКЕ</text>
+  <text x="34" y="630" fill="#cbd5e1" font-size="10.5">.env — RC_WHEEL_PORTS, RC_LIDAR_PORT, RC_BMS_PORT, RC_SENSOR_PORT, RC_CAMERA_*</text>
+  <text x="34" y="648" fill="#cbd5e1" font-size="10.5">rus_slam_map.pgm · .yaml · .png — карта занятости в формате ROS map_server</text>
+  <text x="34" y="666" fill="#cbd5e1" font-size="10.5">data/operators.json — хеши операторов · data/stats.json — рейсы и энергия · журнал событий</text>
+  <text x="640" y="630" fill="#cbd5e1" font-size="10.5">road_map.json — векторная карта</text>
+  <text x="640" y="648" fill="#cbd5e1" font-size="10.5">территории НТЦ (черновик)</text>
+  <text x="640" y="666" fill="#cbd5e1" font-size="10.5">~/.config/rus_slam/map.json — настройки карты</text>
+</svg>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" style="background:#0f172a; font-family:'Segoe UI',Roboto,sans-serif;">
+  <defs>
+    <linearGradient id="dc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <marker id="da" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+
+  <text x="500" y="32" fill="#f8fafc" font-size="19" font-weight="bold" text-anchor="middle">Экран «Доставка» /delivery: четыре шага сухого прогона</text>
+  <text x="500" y="55" fill="#94a3b8" font-size="12" text-anchor="middle">Векторная карта территории НТЦ АВТОВАЗ, граф дорог и проверка логики маршрута без тяги</text>
+
+  <!-- Step 1 -->
+  <rect x="18" y="76" width="228" height="196" rx="9" fill="url(#dc)" stroke="#38bdf8" stroke-width="1.6"/>
+  <circle cx="46" cy="104" r="13" fill="#0284c7"/>
+  <text x="46" y="109" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">1</text>
+  <text x="66" y="109" fill="#7dd3fc" font-size="12.5" font-weight="bold">Где стоит робот</text>
+  <text x="30" y="132" fill="#e2e8f0" font-size="10.5">точка на проезде + курс</text>
+  <text x="30" y="150" fill="#cbd5e1" font-size="10">клик по дороге на карте</text>
+  <text x="30" y="168" fill="#cbd5e1" font-size="10">X, Y и курс в градусах</text>
+  <text x="30" y="186" fill="#cbd5e1" font-size="10">ползунок курса</text>
+  <text x="30" y="204" fill="#cbd5e1" font-size="10">спутниковый фон вкл/выкл</text>
+  <text x="30" y="228" fill="#fbbf24" font-size="10">цвет стрелки — выбранный старт</text>
+  <text x="30" y="246" fill="#94a3b8" font-size="10">без старта маршрут не строится</text>
+
+  <line x1="250" y1="174" x2="268" y2="174" stroke="#38bdf8" stroke-width="2" marker-end="url(#da)"/>
+
+  <!-- Step 2 -->
+  <rect x="272" y="76" width="228" height="196" rx="9" fill="url(#dc)" stroke="#38bdf8" stroke-width="1.6"/>
+  <circle cx="300" cy="104" r="13" fill="#0284c7"/>
+  <text x="300" y="109" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">2</text>
+  <text x="320" y="109" fill="#7dd3fc" font-size="12.5" font-weight="bold">Куда доставить</text>
+  <text x="284" y="132" fill="#e2e8f0" font-size="10.5">узел доставки, а не крыша здания</text>
+  <text x="284" y="150" fill="#cbd5e1" font-size="10">Западный южный въезд</text>
+  <text x="284" y="168" fill="#cbd5e1" font-size="10">Западная площадка</text>
+  <text x="284" y="186" fill="#cbd5e1" font-size="10">Южная восточная площадка</text>
+  <text x="284" y="204" fill="#cbd5e1" font-size="10">НТЦ · черновая точка доставки</text>
+  <text x="284" y="228" fill="#fbbf24" font-size="10">подтверждение: «карта черновая»</text>
+  <text x="284" y="246" fill="#94a3b8" font-size="10">без галочки прогон запрещён</text>
+
+  <line x1="504" y1="174" x2="522" y2="174" stroke="#38bdf8" stroke-width="2" marker-end="url(#da)"/>
+
+  <!-- Step 3 -->
+  <rect x="526" y="76" width="228" height="196" rx="9" fill="url(#dc)" stroke="#22c55e" stroke-width="1.6"/>
+  <circle cx="554" cy="104" r="13" fill="#15803d"/>
+  <text x="554" y="109" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">3</text>
+  <text x="574" y="109" fill="#86efac" font-size="12.5" font-weight="bold">Маршрут по графу</text>
+  <text x="536" y="132" fill="#e2e8f0" font-size="10.5">A* по узлам и участкам дорог</text>
+  <text x="536" y="150" fill="#cbd5e1" font-size="10">участки, повороты, дистанции</text>
+  <text x="536" y="168" fill="#cbd5e1" font-size="10">в единицах карты, не в метрах</text>
+  <text x="536" y="186" fill="#cbd5e1" font-size="10">объекты ПДД на пути</text>
+  <text x="536" y="204" fill="#cbd5e1" font-size="10">привод выключен, тяги нет</text>
+  <text x="536" y="228" fill="#fbbf24" font-size="10">366,44 ед. · 3 участка · 3 ПДД</text>
+  <text x="536" y="246" fill="#94a3b8" font-size="10">пример из прогона на стенде</text>
+
+  <line x1="758" y1="174" x2="776" y2="174" stroke="#38bdf8" stroke-width="2" marker-end="url(#da)"/>
+
+  <!-- Step 4 -->
+  <rect x="780" y="76" width="202" height="196" rx="9" fill="url(#dc)" stroke="#f59e0b" stroke-width="1.6"/>
+  <circle cx="808" cy="104" r="13" fill="#b45309"/>
+  <text x="808" y="109" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">4</text>
+  <text x="828" y="109" fill="#fbbf24" font-size="12.5" font-weight="bold">Сухой прогон</text>
+  <text x="792" y="132" fill="#e2e8f0" font-size="10.5">сценарий препятствий</text>
+  <text x="792" y="150" fill="#cbd5e1" font-size="10">чистая дорога</text>
+  <text x="792" y="168" fill="#cbd5e1" font-size="10">светофор: красный/зелёный</text>
+  <text x="792" y="186" fill="#cbd5e1" font-size="10">знак СТОП, переход</text>
+  <text x="792" y="204" fill="#cbd5e1" font-size="10">яма, кочка, лимит скорости</text>
+  <text x="792" y="228" fill="#fbbf24" font-size="10">лог событий по времени</text>
+  <text x="792" y="246" fill="#94a3b8" font-size="10">кнопки реального движения нет</text>
+
+  <!-- PDD band -->
+  <rect x="18" y="292" width="470" height="212" rx="9" fill="#0b1220" stroke="#1e293b" stroke-width="1.2"/>
+  <text x="253" y="314" fill="#e2e8f0" font-size="12" font-weight="bold" text-anchor="middle">ОБЪЕКТЫ ПДД НА МАРШРУТЕ</text>
+  <rect x="32" y="326" width="212" height="52" rx="6" fill="url(#dc)" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="44" y="345" fill="#fca5a5" font-size="11" font-weight="bold">Светофор tl_north_mid</text>
+  <text x="44" y="362" fill="#e2e8f0" font-size="10">красный — ждать, зелёный — ехать</text>
+  <rect x="258" y="326" width="216" height="52" rx="6" fill="url(#dc)" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="270" y="345" fill="#fbbf24" font-size="11" font-weight="bold">Знак СТОП stop_ntc_turn</text>
+  <text x="270" y="362" fill="#e2e8f0" font-size="10">полная остановка перед поворотом</text>
+  <rect x="32" y="388" width="212" height="52" rx="6" fill="url(#dc)" stroke="#a855f7" stroke-width="1.2"/>
+  <text x="44" y="407" fill="#d8b4fe" font-size="11" font-weight="bold">Переход cross_ntc</text>
+  <text x="44" y="424" fill="#e2e8f0" font-size="10">уступить пешеходу</text>
+  <rect x="258" y="388" width="216" height="52" rx="6" fill="url(#dc)" stroke="#38bdf8" stroke-width="1.2"/>
+  <text x="270" y="407" fill="#7dd3fc" font-size="11" font-weight="bold">Лимит скорости</text>
+  <text x="270" y="424" fill="#e2e8f0" font-size="10">снижение до 8,0 ед/с по участку</text>
+  <text x="34" y="466" fill="#cbd5e1" font-size="10.5">На красный не едет, у СТОП останавливается, пешеходу уступает.</text>
+  <text x="34" y="484" fill="#94a3b8" font-size="10.5">Правила проверяют планировщик и симулятор: это логика, а не движение.</text>
+
+  <!-- Checks band -->
+  <rect x="504" y="292" width="478" height="212" rx="9" fill="#0b1220" stroke="#1e293b" stroke-width="1.2"/>
+  <text x="743" y="314" fill="#e2e8f0" font-size="12" font-weight="bold" text-anchor="middle">ЧТО ПРОВЕРЯЕТ СЕРВЕР ПЕРЕД ПРОГОНОМ</text>
+  <circle cx="524" cy="338" r="3.4" fill="#22c55e"/>
+  <text x="536" y="342" fill="#e2e8f0" font-size="10.5">mapLoaded — векторная карта загружена</text>
+  <circle cx="524" cy="360" r="3.4" fill="#22c55e"/>
+  <text x="536" y="364" fill="#e2e8f0" font-size="10.5">startPoseSet — старт задан точкой и курсом</text>
+  <circle cx="524" cy="382" r="3.4" fill="#22c55e"/>
+  <text x="536" y="386" fill="#e2e8f0" font-size="10.5">goalSelected — пункт доставки выбран</text>
+  <circle cx="524" cy="404" r="3.4" fill="#22c55e"/>
+  <text x="536" y="408" fill="#e2e8f0" font-size="10.5">routeFound — маршрут построен планировщиком</text>
+  <circle cx="524" cy="426" r="3.4" fill="#22c55e"/>
+  <text x="536" y="430" fill="#e2e8f0" font-size="10.5">draftAcknowledged — черновая карта подтверждена</text>
+  <circle cx="524" cy="448" r="3.4" fill="#22c55e"/>
+  <text x="536" y="452" fill="#e2e8f0" font-size="10.5">dryRunOnly и hardwareDisabled — тяга отключена всегда</text>
+  <text x="520" y="480" fill="#fbbf24" font-size="10.5">drivePermitted = false: этот экран не разрешает реальное движение.</text>
+</svg>
