@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" width="1000" height="640" style="background:#0f172a; font-family:'Segoe UI',Roboto,sans-serif;">
+  <defs>
+    <linearGradient id="c1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <text x="500" y="32" fill="#f8fafc" font-size="19" font-weight="bold" text-anchor="middle">Карта экранов BULKA_v1: что открывается по какому адресу</text>
+  <text x="500" y="55" fill="#94a3b8" font-size="12" text-anchor="middle">Слева — веб-пульт оператора (8080), справа — бортовой экран робота (8090); общий код и общие API</text>
+
+  <!-- Wet pult -->
+  <rect x="18" y="76" width="560" height="418" rx="9" fill="url(#c1)" stroke="#38bdf8" stroke-width="1.8"/>
+  <rect x="18" y="76" width="560" height="26" rx="9" fill="#0284c7" opacity="0.28"/>
+  <text x="298" y="94" fill="#7dd3fc" font-size="13" font-weight="bold" text-anchor="middle">ВЕБ-ПУЛЬТ ОПЕРАТОРА · 8080 · ВХОД ПО ЛОГИНУ</text>
+
+  <!-- group: telemetry -->
+  <text x="34" y="126" fill="#94a3b8" font-size="11" font-weight="bold">ТЕЛЕМЕТРИЯ И ДОСТУП</text>
+  <rect x="34" y="134" width="160" height="34" rx="6" fill="#0b1220" stroke="#38bdf8" stroke-width="1.2"/>
+  <text x="114" y="149" fill="#e2e8f0" font-size="11" text-anchor="middle">/ · Пульт</text>
+  <text x="114" y="163" fill="#94a3b8" font-size="9" text-anchor="middle">АКБ, шасси, лидар, камеры</text>
+  <rect x="204" y="134" width="160" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="284" y="149" fill="#e2e8f0" font-size="11" text-anchor="middle">/#summary · Сводка</text>
+  <text x="284" y="163" fill="#94a3b8" font-size="9" text-anchor="middle">рейсы, энергия, журнал</text>
+  <rect x="374" y="134" width="188" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="468" y="149" fill="#e2e8f0" font-size="11" text-anchor="middle">/devices · Устройства</text>
+  <text x="468" y="163" fill="#94a3b8" font-size="9" text-anchor="middle">12 ролей, порты вручную</text>
+
+  <!-- group: chassis -->
+  <text x="34" y="196" fill="#94a3b8" font-size="11" font-weight="bold">ШАССИ, ДАТЧИКИ, ПИТАНИЕ</text>
+  <rect x="34" y="204" width="160" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="114" y="219" fill="#e2e8f0" font-size="11" text-anchor="middle">/sensors</text>
+  <text x="114" y="233" fill="#94a3b8" font-size="9" text-anchor="middle">замок, карты, компас</text>
+  <rect x="204" y="204" width="160" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="284" y="219" fill="#e2e8f0" font-size="11" text-anchor="middle">/connections</text>
+  <text x="284" y="233" fill="#94a3b8" font-size="9" text-anchor="middle">USB, сеть, Bluetooth</text>
+  <rect x="374" y="204" width="188" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="468" y="219" fill="#e2e8f0" font-size="11" text-anchor="middle">/battery</text>
+  <text x="468" y="233" fill="#94a3b8" font-size="9" text-anchor="middle">12 банок, защиты, CSV</text>
+
+  <!-- group: motion -->
+  <text x="34" y="266" fill="#94a3b8" font-size="11" font-weight="bold">ДВИЖЕНИЕ И КАРТА</text>
+  <rect x="34" y="274" width="160" height="34" rx="6" fill="#0b1220" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="114" y="289" fill="#e2e8f0" font-size="11" text-anchor="middle">/controls</text>
+  <text x="114" y="303" fill="#94a3b8" font-size="9" text-anchor="middle">режимы, ноль, калибровка</text>
+  <rect x="204" y="274" width="160" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="284" y="289" fill="#e2e8f0" font-size="11" text-anchor="middle">/map</text>
+  <text x="284" y="303" fill="#94a3b8" font-size="9" text-anchor="middle">сетка занятости, PGM</text>
+  <rect x="374" y="274" width="188" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="468" y="289" fill="#e2e8f0" font-size="11" text-anchor="middle">/scan</text>
+  <text x="468" y="303" fill="#94a3b8" font-size="9" text-anchor="middle">съёмка карты с управлением</text>
+
+  <!-- group: navigation -->
+  <text x="34" y="336" fill="#94a3b8" font-size="11" font-weight="bold">НАВИГАЦИЯ И ДОСТАВКА</text>
+  <rect x="34" y="344" width="160" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="114" y="359" fill="#e2e8f0" font-size="11" text-anchor="middle">/navigation</text>
+  <text x="114" y="373" fill="#94a3b8" font-size="9" text-anchor="middle">цель, маршрут, поездка</text>
+  <rect x="204" y="344" width="160" height="34" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="284" y="359" fill="#e2e8f0" font-size="11" text-anchor="middle">/route</text>
+  <text x="284" y="373" fill="#94a3b8" font-size="9" text-anchor="middle">движение по маршруту</text>
+  <rect x="374" y="344" width="188" height="34" rx="6" fill="#0b1220" stroke="#22c55e" stroke-width="1.2"/>
+  <text x="468" y="359" fill="#e2e8f0" font-size="11" text-anchor="middle">/delivery</text>
+  <text x="468" y="373" fill="#94a3b8" font-size="9" text-anchor="middle">векторная карта, сухой прогон</text>
+
+  <!-- console -->
+  <text x="34" y="406" fill="#94a3b8" font-size="11" font-weight="bold">ИНЖЕНЕРНЫЙ ПУЛЬТ /console — СЕМЬ ВКЛАДОК</text>
+  <rect x="34" y="414" width="528" height="62" rx="6" fill="#0b1220" stroke="#a855f7" stroke-width="1.2"/>
+  <text x="44" y="434" fill="#e2e8f0" font-size="10.5">Пульт · Ходовая · Миссия · Сенсоры · Безопасность · Журнал · Сервис</text>
+  <text x="44" y="452" fill="#94a3b8" font-size="10">светлая тема, работает и в режиме симуляции UART · 4 · 20 Гц</text>
+  <text x="44" y="468" fill="#94a3b8" font-size="10">«Сервис»: замок отсека, ручная подача кадров двигателю, АКБ, статистика</text>
+
+  <!-- Kiosk -->
+  <rect x="596" y="76" width="386" height="418" rx="9" fill="url(#c1)" stroke="#f43f5e" stroke-width="1.8"/>
+  <rect x="596" y="76" width="386" height="26" rx="9" fill="#9f1239" opacity="0.35"/>
+  <text x="789" y="94" fill="#fda4af" font-size="13" font-weight="bold" text-anchor="middle">БОРТОВОЙ ЭКРАН · 8090 · БЕЗ ВХОДА</text>
+
+  <text x="612" y="126" fill="#94a3b8" font-size="11" font-weight="bold">ОСНОВНОЙ ЭКРАН / /kiosk / robot.html</text>
+  <rect x="612" y="134" width="354" height="52" rx="6" fill="#0b1220" stroke="#f43f5e" stroke-width="1.2"/>
+  <text x="622" y="152" fill="#e2e8f0" font-size="10.5">АКБ · Шасси FL/FR/RL/RR · Обзор датчиков</text>
+  <text x="622" y="168" fill="#94a3b8" font-size="10">Лидар 2D · Kinect 3D · общий обзор 3D</text>
+  <text x="622" y="181" fill="#94a3b8" font-size="10">шапка: режим, ПК, данные, «Функции», часы</text>
+
+  <text x="612" y="208" fill="#94a3b8" font-size="11" font-weight="bold">СВАЙП-ЭКРАНЫ</text>
+  <rect x="612" y="216" width="170" height="52" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="697" y="234" fill="#e2e8f0" font-size="10.5" text-anchor="middle">вправо · тяга и руление</text>
+  <text x="697" y="250" fill="#94a3b8" font-size="9.5" text-anchor="middle">режимы, угол колёс,</text>
+  <text x="697" y="263" fill="#94a3b8" font-size="9.5" text-anchor="middle">калибровка, полный ноль</text>
+  <rect x="796" y="216" width="170" height="52" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="881" y="234" fill="#e2e8f0" font-size="10.5" text-anchor="middle">влево · камеры и логи</text>
+  <text x="881" y="250" fill="#94a3b8" font-size="9.5" text-anchor="middle">4 камеры сверху,</text>
+  <text x="881" y="263" fill="#94a3b8" font-size="9.5" text-anchor="middle">журнал событий</text>
+
+  <text x="612" y="292" fill="#94a3b8" font-size="11" font-weight="bold">ОТДЕЛЬНЫЕ СТРАНИЦЫ (ОБЩИЕ С ПУЛЬТОМ)</text>
+  <rect x="612" y="300" width="354" height="86" rx="6" fill="#0b1220" stroke="#475569" stroke-width="1.2"/>
+  <text x="622" y="318" fill="#e2e8f0" font-size="10.5">/map — карта лидара · /navigation — цель и маршрут</text>
+  <text x="622" y="334" fill="#e2e8f0" font-size="10.5">/delivery — доставка по векторной карте</text>
+  <text x="622" y="350" fill="#e2e8f0" font-size="10.5">/devices — порты · /sensors — модуль датчиков</text>
+  <text x="622" y="366" fill="#e2e8f0" font-size="10.5">/battery — все банки BMS · /route — предпросмотр</text>
+  <text x="622" y="380" fill="#94a3b8" font-size="9.5">PIN 7232 нужен только для открытия грузового отсека</text>
+
+  <text x="612" y="410" fill="#94a3b8" font-size="11" font-weight="bold">ПАНЕЛЬ «ФУНКЦИИ»</text>
+  <rect x="612" y="418" width="354" height="58" rx="6" fill="#0b1220" stroke="#a855f7" stroke-width="1.2"/>
+  <text x="622" y="436" fill="#e2e8f0" font-size="10.5">Открыть отсек · Руление и движение · Темы (20)</text>
+  <text x="622" y="452" fill="#e2e8f0" font-size="10.5">Карта лидара · Сброс карты · Вернуться к статистике</text>
+  <text x="622" y="468" fill="#94a3b8" font-size="10">«Подсветка» и «Сигнал» пока без команды на роботе</text>
+
+  <!-- Bottom note -->
+  <rect x="18" y="508" width="964" height="112" rx="9" fill="#0b1220" stroke="#1e293b" stroke-width="1.2"/>
+  <text x="500" y="530" fill="#e2e8f0" font-size="12" font-weight="bold" text-anchor="middle">ОБЩЕЕ ДЛЯ ВСЕХ ЭКРАНОВ</text>
+  <text x="34" y="552" fill="#cbd5e1" font-size="10.5">Страницы и стили общие: один и тот же файл отдаётся и пульту, и бортовому экрану — расходится только оформление и доступ.</text>
+  <text x="34" y="570" fill="#cbd5e1" font-size="10.5">Данные приходят из одного источника: состояние шасси, скан лидара, BMS, камеры и модуль датчиков читает бортовой процесс.</text>
+  <text x="34" y="588" fill="#cbd5e1" font-size="10.5">Пустой экран честен: «нет связи», «нет данных» и причина — вместо демонстрационных чисел. Демо-скан помечается как скан через API.</text>
+  <text x="34" y="606" fill="#fbbf24" font-size="10.5">E-STOP и «Остановить всё» есть в шапке пульта; снятие защёлки E-STOP требует PIN.</text>
+</svg>

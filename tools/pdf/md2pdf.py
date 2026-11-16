@@ -313,6 +313,18 @@ def build_styles(fonts: dict) -> StyleSheet1:
     )
     ss.add(
         ParagraphStyle(
+            name="Caption",
+            fontName=sans,
+            fontSize=8.2,
+            leading=10.6,
+            alignment=TA_CENTER,
+            textColor=GRAY,
+            spaceBefore=2,
+            spaceAfter=10,
+        )
+    )
+    ss.add(
+        ParagraphStyle(
             name="Missing",
             fontName=sans,
             fontSize=8.4,
@@ -1065,7 +1077,7 @@ def _blocks(lines, start, end, base_dir, ss: StyleSheet1, avail_width: float):
             flowables.extend(list_flows)
             continue
 
-        # --- одиночное изображение
+        # --- одиночное изображение (alt-текст печатается подписью)
         only_image = IMAGE_RE.fullmatch(stripped)
         if only_image:
             flow = image_flowable(
@@ -1073,6 +1085,9 @@ def _blocks(lines, start, end, base_dir, ss: StyleSheet1, avail_width: float):
             )
             flow.hAlign = "CENTER"
             flowables.append(flow)
+            caption = (only_image.group("alt") or "").strip()
+            if caption:
+                flowables.append(Paragraph(inline(caption), ss["Caption"]))
             i += 1
             continue
 
