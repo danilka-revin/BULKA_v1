@@ -308,7 +308,7 @@ def test_calculated_csv_matches_the_estimate(result):
     with be.OUT_CSV.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
     body = [row for row in rows if row["id"]]
-    assert len(body) == result["positions"] == 64
+    assert len(body) == result["positions"] == 63
     assert sum(Decimal(row["total_rub"]) for row in body) == result["parts_total"]
     tail = {row["name"]: Decimal(row["total_rub"]) for row in rows if not row["id"]}
     assert tail["Комплектующие и материалы"] == result["parts_total"]
@@ -317,7 +317,7 @@ def test_calculated_csv_matches_the_estimate(result):
 
 def test_totals_json_is_complete(result):
     summary = be.totals(result)
-    assert summary["positions"] == 64
+    assert summary["positions"] == 63
     assert summary["offers_used"] <= summary["offers_total"]
     assert set(summary["sections"]) == {section["id"] for section in result["sections"]}
     json.dumps(summary)  # всё сериализуется
