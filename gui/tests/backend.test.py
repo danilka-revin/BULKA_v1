@@ -8,6 +8,7 @@ PIN-хранилище (попытки, блокировка, смена PIN, ц
 и HTTP API (статика, /api/state, открытие/закрытие замка, /api/audit).
 """
 
+import http.client
 import json
 import os
 import sys
@@ -185,7 +186,7 @@ class TestApi(unittest.TestCase):
         opener = urllib.request.build_opener(urllib.request.HTTPRedirectHandler)
         with opener.open(req, timeout=5) as r:
             body = r.read().decode("utf-8")
-        check("HTTP: / отдаёт основной экран", "основной экран робота" in body, body[:60])
+        check("HTTP: / без сессии отдаёт экран запуска", "БОРТОВОЙ" in body and "PIN" in body, body[:80])
 
     def test_02_state(self):
         status, body = self.get("/api/state")
@@ -235,6 +236,148 @@ class TestApi(unittest.TestCase):
         check("API: смена PIN через API", status == 200 and body.get("ok") is True, body)
         status2, body2 = self.post("/api/lock/open", {"pin": "1357"})
         check("API: новый PIN открывает отсек", status2 == 200 and body2.get("ok") is True, body2)
+
+
+class TestGate(unittest.TestCase):
+    """Экран запуска: PIN выбирает роль, роль живёт в cookie и ограничивает доступ."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.mkdtemp()
+        lock = os.path.join(cls.tmp, "gate-lock.json")
+        app = B.App(B.SimSource(), B.Vault(lock, "2580"),
+                    operator_pin="7232", user_pin="5656")
+        B.ApiHandler.app = app
+        cls.app = app
+        cls.server = B.ThreadingHTTPServer(("127.0.0.1", 0), B.partial(B.ApiHandler))
+        cls.port = cls.server.server_address[1]
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        time.sleep(0.2)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+
+    def call(self, method, path, payload=None, cookie=None, headers=None):
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        body, hdrs = None, dict(headers or {})
+        if payload is not None:
+            body = json.dumps(payload).encode()
+            hdrs["Content-Type"] = "application/json"
+        if cookie:
+            hdrs["Cookie"] = cookie
+        headers = hdrs
+        conn.request(method, path, body, headers)
+        res = conn.getresponse()
+        raw = res.read()
+        out = (res.status, res.getheader("Location"), res.getheader("Set-Cookie"),
+               json.loads(raw.decode("utf-8")) if raw and (res.getheader("Content-Type") or "").startswith("application/json") else raw.decode("utf-8", "replace"))
+        conn.close()
+        return out
+
+    @staticmethod
+    def cookie_of(set_cookie):
+        return (set_cookie or "").split(";", 1)[0]
+
+    def login(self, pin):
+        return self.call("POST", "/api/gate", {"pin": pin})
+
+    def test_01_gate_redirect(self):
+        status, where, _, _ = self.call("GET", "/")
+        check("шлюз: / без сессии → gate.html", status == 302 and where == "/gate.html", (status, where))
+        status, where, _, _ = self.call("GET", "/main.html")
+        check("шлюз: киоск без сессии недоступен", status == 302 and where == "/gate.html", (status, where))
+        status, where, _, _ = self.call("GET", "/index.html")
+        check("шлюз: пульт без сессии недоступен", status == 302 and where == "/gate.html", (status, where))
+
+    def test_02_gate_page(self):
+        status, _, _, body = self.call("GET", "/gate.html")
+        check("шлюз: страница с PIN-клавиатурой отдаётся",
+              status == 200 and "БОРТОВОЙ" in body and "data-key" in body, status)
+
+    def test_03_gate_wrong(self):
+        status, _, _, body = self.login("1111")
+        check("шлюз: неверный PIN → 403 и остаток попыток",
+              status == 403 and body.get("ok") is False and body.get("attemptsLeft") == 4, body)
+
+    def test_04_operator(self):
+        status, _, cookie, body = self.login("7232")
+        check("шлюз: 7232 → роль оператора", status == 200 and body.get("role") == "operator"
+              and body.get("redirect") == "/main.html", body)
+        check("шлюз: сессия в HttpOnly-cookie",
+              "HttpOnly" in (cookie or "") and self.cookie_of(cookie).startswith("rus_role="), cookie)
+        jar = self.cookie_of(cookie)
+        status, where, _, _ = self.call("GET", "/", cookie=jar)
+        check("оператор: / ведёт в киоск", status == 302 and where == "/main.html", (status, where))
+        status, _, _, body = self.call("GET", "/main.html", cookie=jar)
+        check("оператор: киоск открывается", status == 200 and "основной экран робота" in body, status)
+        status, _, _, _ = self.call("GET", "/index.html", cookie=jar)
+        check("оператор: инженерный пульт открывается", status == 200, status)
+
+    def test_04b_token_fallback(self):
+        _, _, _, body = self.login("7232")
+        token = body.get("token")
+        check("шлюз: токен возвращается странице", bool(token), body)
+        status, _, _, page = self.call("GET", "/main.html?t=" + token)
+        check("вход без cookie: киоск по ?t=", status == 200 and "основной экран робота" in page, status)
+        status, _, _, sess = self.call("GET", "/api/session", headers={"X-Session": token})
+        check("вход без cookie: X-Session даёт роль", status == 200 and sess.get("role") == "operator", sess)
+        status, where, _, _ = self.call("GET", "/main.html?t=forged-token")
+        check("вход без cookie: чужой токен не пускает", status == 302 and where == "/gate.html", (status, where))
+
+    def test_05_user(self):
+        status, _, cookie, body = self.login("5656")
+        check("шлюз: 5656 → роль получателя", status == 200 and body.get("role") == "user"
+              and body.get("redirect") == "/user.html", body)
+        jar = self.cookie_of(cookie)
+        status, where, _, _ = self.call("GET", "/", cookie=jar)
+        check("получатель: / ведёт на панель", status == 302 and where == "/user.html", (status, where))
+        status, where, _, _ = self.call("GET", "/main.html", cookie=jar)
+        check("получатель: киоск оператора недоступен", status == 302 and where == "/user.html", (status, where))
+        status, where, _, _ = self.call("GET", "/index.html", cookie=jar)
+        check("получатель: инженерный пульт закрыт", status == 302 and where == "/gate.html", (status, where))
+        status, _, _, body = self.call("GET", "/user.html", cookie=jar)
+        check("получатель: панель открывается", status == 200 and "панель получателя" in body, status)
+        status, _, _, _ = self.call("GET", "/api/session", cookie=jar)
+        check("API: /api/session отдаёт роль", status == 200, status)
+
+    def test_06_user_lock(self):
+        _, _, cookie, _ = self.login("5656")
+        jar = self.cookie_of(cookie)
+        status, _, _, body = self.call("POST", "/api/lock/close", {}, cookie=jar)
+        check("получатель: закрытие без PIN запрещено", status == 403 and body.get("ok") is False, body)
+        status, _, _, body = self.call("POST", "/api/lock/pin",
+                                       {"current": "2580", "new": "9999"}, cookie=jar)
+        check("получатель: смена PIN запрещена", status == 403 and body.get("ok") is False, body)
+        status, _, _, body = self.call("POST", "/api/lock/open", {"pin": "2580"}, cookie=jar)
+        check("получатель: отсек открывается по PIN", status == 200 and body.get("ok") is True, body)
+        status, _, _, body = self.call("POST", "/api/lock/close", {"pin": "2580"}, cookie=jar)
+        check("получатель: отсек закрывается по PIN", status == 200 and body.get("ok") is True, body)
+
+    def test_07_state_open_without_session(self):
+        status, _, _, body = self.call("GET", "/api/state")
+        check("API: /api/state доступен без сессии (нативные экраны)",
+              status == 200 and body.get("ok") is True, status)
+
+    def test_08_logout(self):
+        _, _, cookie, _ = self.login("7232")
+        jar = self.cookie_of(cookie)
+        status, _, clear, body = self.call("POST", "/api/logout", {}, cookie=jar)
+        check("выход: сессия сбрасывается", status == 200 and "Max-Age=0" in (clear or ""), clear)
+        status, where, _, _ = self.call("GET", "/main.html", cookie=jar)
+        check("выход: киоск снова за шлюзом", status == 302 and where == "/gate.html", (status, where))
+
+    def test_09_gate_lockout(self):
+        self.app.gate_fails = 0
+        self.app.gate_lock_until = 0.0
+        for _ in range(B.GATE_MAX_ATTEMPTS):
+            status, _, _, body = self.login("0000")
+        check("шлюз: 5 неверных попыток → блокировка", body.get("attemptsLeft") == 0
+              and body.get("remainingMs", 0) > 0, body)
+        status, _, _, body = self.login("7232")
+        check("шлюз: во время блокировки верный PIN не пускает", status == 403 and body.get("ok") is False, body)
+        self.app.gate_fails = 0
+        self.app.gate_lock_until = 0.0
 
 
 class TestServerNoWindows(unittest.TestCase):

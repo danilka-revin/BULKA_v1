@@ -1,5 +1,5 @@
 [Unit]
-Description=RUS SLAM: основной экран на дисплее робота
+Description=RUS SLAM: экран запуска (PIN) на дисплее робота
 Documentation=file:/opt/rus_slam/docs/RUN_AND_ACCESS.md
 After=rus-slam-server.service
 Wants=rus-slam-server.service
@@ -8,8 +8,8 @@ PartOf=graphical.target
 [Service]
 Type=simple
 
-# Страница на дисплее робота: тот же адрес, что открывает инженер удалённо.
-ExecStart=/opt/rus_slam/deploy/systemd/display.sh http://127.0.0.1:8080/
+# Экран запуска: PIN 7232 — киоск оператора, 5656 — панель получателя.
+ExecStart=/opt/rus_slam/deploy/systemd/display.sh http://127.0.0.1:8080/gate.html
 
 Restart=always
 RestartSec=3

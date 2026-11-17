@@ -11,12 +11,17 @@ backend.py — сервер борта RUS SLAM: отдаёт экраны и д
 страницы смотрят в браузере — на дисплее робота, планшете или ноутбуке.
 Один процесс отдаёт оба экрана и данные к ним:
 
-    /                     → основной экран робота (main.html, киоск)
-    /index.html, /console → инженерный пульт (index.html)
+    /gate.html            → экран запуска: PIN оператора (7232) или получателя (5656)
+    /                     → редирект: оператор → киоск, получатель → user.html, без входа → gate.html
+    /main.html            → основной экран робота (киоск оператора)
+    /user.html            → монитор получателя: только чтение + PIN отсека
+    /index.html, /console → инженерный пульт (index.html), только оператору
+    /api/gate             → вход по PIN запуска, выдаёт роль в HttpOnly-cookie
+    /api/logout           → сменить пользователя (сбросить сессию)
     /api/state            → состояние: двигатели, АКБ, груз, замок, связь
     /api/lock/open        → открыть грузовой отсек по PIN-коду
-    /api/lock/close       → закрыть отсек
-    /api/lock/pin         → сменить PIN-код
+    /api/lock/close       → закрыть отсек (получателю — тоже по PIN)
+    /api/lock/pin         → сменить PIN-код (только оператор)
     /api/audit            → журнал доступа (аудит с хеш-цепочкой)
     /api/health           → проверка живости
 
@@ -55,6 +60,7 @@ import secrets
 import shutil
 import socket
 import struct
+import urllib.parse
 import subprocess
 import sys
 import threading
@@ -68,10 +74,24 @@ STATE_DIR = os.path.join(ROOT, "state")
 LOCK_FILE = os.path.join(STATE_DIR, "lock.json")
 MAIN_PAGE = "/main.html"
 CONSOLE_PAGE = "/index.html"
+GATE_PAGE = "/gate.html"
+USER_PAGE = "/user.html"
 
 DEFAULT_PIN = "2580"
 MAX_ATTEMPTS = 5
 LOCK_MS = 30_000
+
+# PIN запуска на бортовом экране: 7232 — штатный киоск, 5656 — монитор получателя.
+OPERATOR_PIN = "7232"
+USER_PIN = "5656"
+GATE_MAX_ATTEMPTS = 5
+GATE_LOCK_MS = 30_000
+SESSION_TTL = 8 * 3600
+SESSION_COOKIE = "rus_role"
+
+# Страницы и скрипты, которые в режиме получателя недоступны.
+OPERATOR_ONLY = ("/index.html", "/index.htm", "/app.js", "/console.js",
+                 "/console-core.js", "/vision.js", "/styles.css")
 
 # --- Протокол (docs/SERIAL_PROTOCOL.md) -------------------------------------
 CMD_SYNC = (0xAA, 0x55)
@@ -481,6 +501,12 @@ class Vault:
         self.data["audit"].append(entry)
         del self.data["audit"][:-200]
 
+    def note(self, action, ok, detail=""):
+        """Добавить событие в журнал (например, вход на бортовом экране)."""
+        with self.lock:
+            self._audit(action, ok, detail)
+            self._persist()
+
     def verify_audit(self):
         prev = "genesis"
         for i, e in enumerate(self.data["audit"]):
@@ -578,13 +604,94 @@ def hardware_lock(action):
 # ============================================================================
 # 5. Состояние приложения
 # ============================================================================
+class Sessions:
+    """Сессии бортового экрана: роль живёт в памяти, браузер получает HttpOnly-cookie."""
+
+    def __init__(self, ttl=SESSION_TTL, clock=time.time):
+        self.ttl = ttl
+        self.clock = clock
+        self.lock = threading.Lock()
+        self.tokens = {}                    # token → (role, expires)
+
+    def create(self, role):
+        token = secrets.token_urlsafe(24)
+        with self.lock:
+            self._gc()
+            self.tokens[token] = (role, self.clock() + self.ttl)
+        return token
+
+    def role(self, token):
+        if not token:
+            return None
+        with self.lock:
+            item = self.tokens.get(token)
+            if not item:
+                return None
+            role, expires = item
+            if expires <= self.clock():
+                self.tokens.pop(token, None)
+                return None
+            return role
+
+    def drop(self, token):
+        with self.lock:
+            self.tokens.pop(token or "", None)
+
+    def _gc(self):
+        now = self.clock()
+        for tok in [k for k, (_, exp) in self.tokens.items() if exp <= now]:
+            self.tokens.pop(tok, None)
+
+
 class App:
-    def __init__(self, source, vault, cargo_nominal_kg=80):
+    def __init__(self, source, vault, cargo_nominal_kg=80,
+                 operator_pin=OPERATOR_PIN, user_pin=USER_PIN):
         self.source = source
         self.vault = vault
         self.cargo_nominal_kg = cargo_nominal_kg
         self.lock_open = False
         self.started = time.time()
+        self.operator_pin = str(operator_pin)
+        self.user_pin = str(user_pin)
+        self.sessions = Sessions()
+        self.gate_lock = threading.Lock()
+        self.gate_fails = 0
+        self.gate_lock_until = 0.0
+
+    # --- вход на бортовом экране ---
+    def login(self, pin):
+        """PIN запуска: 7232 — оператор, 5656 — получатель. Возвращает роль и токен."""
+        pin = re.sub(r"\D", "", str(pin or ""))
+        with self.gate_lock:
+            now = time.time()
+            if now < self.gate_lock_until:
+                return {"ok": False, "error": "ввод заблокирован",
+                        "remainingMs": int((self.gate_lock_until - now) * 1000)}
+            if pin == self.operator_pin:
+                role = "operator"
+            elif pin == self.user_pin:
+                role = "user"
+            else:
+                self.gate_fails += 1
+                left = max(0, GATE_MAX_ATTEMPTS - self.gate_fails)
+                if left == 0:
+                    self.gate_fails = 0
+                    self.gate_lock_until = now + GATE_LOCK_MS / 1000.0
+                self.vault.note("gate", False, "неверный PIN экрана")
+                return {"ok": False, "error": "неверный PIN", "attemptsLeft": left,
+                        "remainingMs": max(0, int((self.gate_lock_until - now) * 1000))}
+            self.gate_fails = 0
+            token = self.sessions.create(role)
+        self.vault.note("gate", True, "оператор" if role == "operator" else "получатель")
+        return {"ok": True, "role": role, "token": token,
+                "redirect": MAIN_PAGE if role == "operator" else USER_PAGE}
+
+    def role(self, token):
+        role = self.sessions.role(token)
+        return role if role in ("operator", "user") else None
+
+    def logout(self, token):
+        self.sessions.drop(token)
 
     def snapshot(self):
         data = self.source.read()
@@ -627,11 +734,15 @@ class ApiHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=ROOT, **kwargs)
 
     # --- утилиты ---
-    def _json(self, payload, code=200):
+    def _json(self, payload, code=200, token=None, drop=False):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        if token:
+            self._cookie(token)
+        if drop:
+            self._drop_cookie()
         self.end_headers()
         self.wfile.write(body)
 
@@ -643,11 +754,66 @@ class ApiHandler(SimpleHTTPRequestHandler):
         except (ValueError, UnicodeDecodeError, OSError):
             return {}
 
+    # --- сессии ---
+    def _query_token(self):
+        m = re.search(r"[?&]t=([^&]+)", self.path)
+        return urllib.parse.unquote(m.group(1)) if m else ""
+
+    def _token(self):
+        # Заголовок и ?t= нужны там, где cookie не доходят (встроенный просмотр,
+        # сторонние iframe, браузер с выключенными cookie). Cookie — основной путь.
+        header = self.headers.get("X-Session") or ""
+        if header:
+            return header.strip()
+        query = self._query_token()
+        if query:
+            return query
+        raw = self.headers.get("Cookie") or ""
+        for part in raw.split(";"):
+            name, _, value = part.strip().partition("=")
+            if name == SESSION_COOKIE:
+                return value
+        return ""
+
+    def _role(self):
+        return self.app.role(self._token())
+
+    def _cookie(self, token):
+        self.send_header("Set-Cookie", "%s=%s; Path=/; Max-Age=%d; HttpOnly; SameSite=Strict"
+                         % (SESSION_COOKIE, token, SESSION_TTL))
+
+    def _drop_cookie(self):
+        self.send_header("Set-Cookie", "%s=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"
+                         % SESSION_COOKIE)
+
+    def _redirect(self, where, token=None, drop=False):
+        self.send_response(302)
+        self.send_header("Location", where)
+        if token:
+            self._cookie(token)
+        if drop:
+            self._drop_cookie()
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
+    def _home(self, role):
+        return MAIN_PAGE if role == "operator" else USER_PAGE
+
+    def _with_token(self, where):
+        """Перенести ?t= в редирект: токен из cookie в адрес не попадает."""
+        query = self._query_token()
+        if not query:
+            return where
+        return where + "?" + urllib.parse.urlencode({"t": query})
+
     # --- маршруты ---
     def do_GET(self):                                            # noqa: N802
         path = self.path.split("?", 1)[0]
+        role = self._role()
         if path == "/api/state":
             return self._json({"ok": True, "data": self.app.snapshot()})
+        if path == "/api/session":
+            return self._json({"ok": True, "role": role, "home": self._home(role) if role else GATE_PAGE})
         if path == "/api/audit":
             limit = 20
             m = re.search(r"[?&]limit=(\d+)", self.path)
@@ -658,28 +824,57 @@ class ApiHandler(SimpleHTTPRequestHandler):
         if path == "/api/health":
             return self._json({"ok": True, "source": getattr(self.app.source, "name", "?"),
                                "uptimeSec": int(time.time() - self.app.started),
-                               "pinDefault": self.app.vault.default_pin})
+                               "pinDefault": self.app.vault.default_pin,
+                               "gate": True})
         if path in ("/", "/index.htm", "/default.html"):
-            self.send_response(302)
-            self.send_header("Location", MAIN_PAGE)
-            self.end_headers()
-            return
+            if not role:
+                return self._redirect(GATE_PAGE)
+            return self._redirect(self._with_token(self._home(role)))
         if path == "/console":
-            self.send_response(302)
-            self.send_header("Location", CONSOLE_PAGE)
-            self.end_headers()
-            return
+            if role != "operator":
+                return self._redirect(GATE_PAGE)
+            return self._redirect(self._with_token(CONSOLE_PAGE))
+        if path in OPERATOR_ONLY:
+            if role != "operator":
+                return self._redirect(GATE_PAGE)
+            return super().do_GET()
+        if path in ("/main.html", "/main.htm"):
+            if role == "user":
+                return self._redirect(self._with_token(USER_PAGE))
+            if role != "operator":
+                return self._redirect(GATE_PAGE)
+            return super().do_GET()
+        if path in ("/user.html", "/user.htm"):
+            if role is None:
+                return self._redirect(GATE_PAGE)
+            return super().do_GET()
         super().do_GET()
 
     def do_POST(self):                                           # noqa: N802
         path = self.path.split("?", 1)[0]
         body = self._body()
+        role = self._role()
+        if path == "/api/gate":
+            res = self.app.login(body.get("pin", ""))
+            if not res.get("ok"):
+                return self._json(res, 403)
+            return self._json(res, 200, token=res.get("token"))
+        if path == "/api/logout":
+            self.app.logout(self._token())
+            return self._json({"ok": True}, 200, drop=True)
         if path == "/api/lock/open":
             res = self.app.open_lock(body.get("pin", ""))
             return self._json(res, 200 if res.get("ok") else 403)
         if path == "/api/lock/close":
+            # Получатель не управляет замком напрямую: закрытие тоже по PIN отсека.
+            if role == "user" and not self.app.vault.verify(body.get("pin", "")).get("ok"):
+                res = {"ok": False, "error": "нужен PIN отсека",
+                       "lock": self.app.vault.state(self.app.lock_open)}
+                return self._json(res, 403)
             return self._json(self.app.close_lock())
         if path == "/api/lock/pin":
+            if role == "user":
+                return self._json({"ok": False, "error": "в режиме получателя PIN не меняется"}, 403)
             res = self.app.vault.set_pin(body.get("current", ""), body.get("new", ""))
             if res.get("ok"):
                 self.app.close_lock()
@@ -743,7 +938,7 @@ def build_app(args):
     source = make_source(args.source, args.ports)
     vault = Vault(args.lock_file or LOCK_FILE, args.pin or DEFAULT_PIN,
                   max_attempts=args.max_attempts, lock_ms=int(args.lock_sec * 1000))
-    return App(source, vault)
+    return App(source, vault, operator_pin=args.operator_pin, user_pin=args.user_pin)
 
 
 def main(argv=None):
@@ -754,13 +949,17 @@ def main(argv=None):
                     help="источник данных (по умолчанию sim — стенд)")
     ap.add_argument("--ports", default="", help="UART-порты для --source serial, через запятую")
     ap.add_argument("--pin", default=DEFAULT_PIN, help="заводской PIN отсека (по умолчанию 2580)")
+    ap.add_argument("--operator-pin", default=OPERATOR_PIN,
+                    help="PIN запуска штатного киоска (по умолчанию 7232)")
+    ap.add_argument("--user-pin", default=USER_PIN,
+                    help="PIN запуска монитора получателя (по умолчанию 5656)")
     ap.add_argument("--lock-file", default="", help="файл состояния замка (по умолчанию gui/state/lock.json)")
     ap.add_argument("--max-attempts", type=int, default=MAX_ATTEMPTS)
     ap.add_argument("--lock-sec", type=float, default=LOCK_MS / 1000.0)
     ap.add_argument("--kiosk", action="store_true",
-                    help="опция: открыть основной экран браузером на дисплее робота (без рамок)")
+                    help="опция: открыть экран запуска браузером на дисплее робота (без рамок)")
     ap.add_argument("--open", action="store_true",
-                    help="опция: открыть основной экран в браузере робота (с рамками)")
+                    help="опция: открыть экран запуска в браузере робота (с рамками)")
     ap.add_argument("--delay", type=float, default=1.2)
     ap.add_argument("--reset-pin", action="store_true", help="сбросить PIN к заводскому")
     args = ap.parse_args(argv)
@@ -780,13 +979,15 @@ def main(argv=None):
 
     server = ThreadingHTTPServer((args.host, args.port),
                                  partial(ApiHandler))
-    url = "http://127.0.0.1:%d%s" % (args.port, MAIN_PAGE)
+    url = "http://127.0.0.1:%d%s" % (args.port, GATE_PAGE)
 
     print("RUS SLAM · сервер борта: страницы и API (сам окон не открывает)")
     print("  источник данных : %s" % getattr(app.source, "name", "?"))
-    print("  на роботе       : %s" % url)
+    print("  на роботе       : %s   (PIN оператора 7232 · получателя 5656)" % url)
     for ip in local_ips():
-        print("  с планшета/ПК   : http://%s:%d%s" % (ip, args.port, MAIN_PAGE))
+        print("  с планшета/ПК   : http://%s:%d%s" % (ip, args.port, GATE_PAGE))
+    print("  киоск оператора : http://127.0.0.1:%d%s" % (args.port, MAIN_PAGE))
+    print("  получатель      : http://127.0.0.1:%d%s" % (args.port, USER_PAGE))
     print("  пульт (удалённо): http://127.0.0.1:%d%s" % (args.port, CONSOLE_PAGE))
     print("  API             : /api/state · /api/lock/open · /api/lock/close · /api/audit · /api/health")
     print("  дисплей робота  : страницу показывает deploy/systemd/rus-slam-display.service")

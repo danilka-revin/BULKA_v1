@@ -8,6 +8,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    // Инженерный пульт открывается по cookie или ?t= от экрана запуска.
+    (function () {
+      var q = new URLSearchParams(location.search).get('t');
+      if (q) { try { localStorage.setItem('rus_token', q); } catch (e) {} }
+      var token = q;
+      if (!token) { try { token = localStorage.getItem('rus_token'); } catch (e) {} }
+      if (!token) return;
+      var native = window.fetch;
+      window.fetch = function (url, opts) {
+        opts = opts || {};
+        opts.headers = Object.assign({}, opts.headers, { 'X-Session': token });
+        return native.call(window, url, opts);
+      };
+    })();
+  </script>
 </head>
 <body>
   <div class="app">

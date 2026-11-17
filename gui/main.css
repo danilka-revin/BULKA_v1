@@ -60,6 +60,11 @@ body{
 .sc-link{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px}
 .sc-dot{width:11px;height:11px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px #7ddc5222}
 .sc-dot.off{background:var(--err);box-shadow:0 0 0 4px #ff6a5522}
+.sc-user-btn{
+  appearance:none;background:transparent;border:1px solid var(--line);color:var(--muted);
+  border-radius:999px;padding:7px 12px;font:inherit;font-size:12px;letter-spacing:.06em;cursor:pointer;
+}
+.sc-user-btn:hover{color:var(--ink);border-color:#36503f}
 .sc-clock{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 
 /* ---------- 2. Сетка ---------- */

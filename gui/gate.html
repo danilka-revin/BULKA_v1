@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RUS SLAM — вход на борт</title>
+  <meta name="theme-color" content="#0b1411" />
+  <style>
+    :root {
+      --bg: #0b1411;
+      --panel: #121d18;
+      --panel-2: #17241e;
+      --line: #22332b;
+      --ink: #e8f2ec;
+      --muted: #7f958a;
+      --accent: #d5ff45;
+      --accent-dim: rgba(213, 255, 69, 0.16);
+      --warn: #ff8a5c;
+      --err: #ff5f56;
+      --ok: #46e08a;
+      --radius: 22px;
+      --font: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+      --mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 700px at 18% 8%, rgba(213, 255, 69, 0.09), transparent 60%),
+        radial-gradient(900px 600px at 92% 95%, rgba(70, 224, 138, 0.07), transparent 55%),
+        var(--bg);
+      display: grid;
+      place-items: center;
+      padding: clamp(16px, 3vw, 40px);
+      overflow: hidden;
+    }
+
+    /* Тонкая техническая сетка на фоне */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+    }
+
+    .gate {
+      position: relative;
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: clamp(20px, 4vw, 64px);
+      align-items: center;
+    }
+
+    /* ── левая колонка: кто и что ───────────────────────────── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 34px;
+    }
+
+    .brand .mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #10200f;
+      flex: none;
+    }
+
+    .brand b {
+      display: block;
+      font-size: 19px;
+      letter-spacing: 0.16em;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4.6vw, 58px);
+      line-height: 0.98;
+      letter-spacing: -0.02em;
+      font-weight: 650;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .lead {
+      margin: 18px 0 0;
+      max-width: 36ch;
+      font-size: clamp(14px, 1.25vw, 17px);
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .telemetry {
+      margin-top: 38px;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      max-width: 460px;
+    }
+
+    .tel-k {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .tel-v {
+      font-family: var(--mono);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 0 3px rgba(70, 224, 138, 0.12);
+      flex: none;
+    }
+
+    .dot.bad { background: var(--err); box-shadow: 0 0 0 3px rgba(255, 95, 86, 0.12); }
+    .dot.warn { background: var(--warn); box-shadow: 0 0 0 3px rgba(255, 138, 92, 0.12); }
+
+    .foot-left {
+      margin-top: 44px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #54665c;
+    }
+
+    /* ── правая колонка: клавиатура ─────────────────────────── */
+    .pad-card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 45%), var(--panel);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 8px);
+      padding: clamp(20px, 2.4vw, 30px);
+      box-shadow:
+        0 40px 80px -40px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .pad-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .pad-title {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .lock-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 11px;
+    }
+
+    .pins {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      padding: 14px 0 10px;
+    }
+
+    .pin-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #35483e;
+      background: transparent;
+      transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+    }
+
+    .pin-dot.on {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: scale(1.06);
+      box-shadow: 0 0 18px rgba(213, 255, 69, 0.35);
+    }
+
+    .status {
+      min-height: 40px;
+      margin: 6px 0 14px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+
+    .status.error { color: var(--err); }
+    .status.ok { color: var(--accent); }
+    .status strong { font-family: var(--mono); }
+
+    .keys {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(8px, 1vw, 12px);
+    }
+
+    .key {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #1a2822, #14201b);
+      color: var(--ink);
+      border-radius: 16px;
+      min-height: clamp(56px, 7.4vh, 74px);
+      font-family: var(--mono);
+      font-size: clamp(21px, 2.1vw, 26px);
+      cursor: pointer;
+      transition: transform 0.06s ease, background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .key:hover { border-color: #36503f; }
+    .key:active, .key.press { transform: scale(0.97); background: #23362c; }
+    .key:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .key.util {
+      font-family: var(--font);
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .key.enter {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #10200f;
+      font-size: 20px;
+    }
+
+    .key.enter:hover { background: #e0ff70; }
+    .key.enter:disabled { opacity: 0.35; cursor: default; }
+
+    .demo {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #5b6e64;
+    }
+
+    .demo b {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    /* уже вошли — предложить продолжить */
+    .resume {
+      display: none;
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(213, 255, 69, 0.28);
+      background: var(--accent-dim);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .resume.show { display: block; }
+
+    .resume a { color: var(--accent); }
+
+    /* тряска при ошибке */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-9px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(3px); }
+    }
+
+    .pad-card.shake { animation: shake 0.42s ease; }
+
+    @media (max-width: 900px) {
+      body { overflow: auto; padding: 18px; }
+      .gate { grid-template-columns: 1fr; gap: 26px; max-width: 460px; }
+      .brand { margin-bottom: 22px; }
+      h1 { font-size: clamp(30px, 9vw, 40px); }
+      .lead { margin-top: 12px; }
+      .telemetry { margin-top: 24px; }
+      .foot-left { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<!--
+  Экран запуска бортового дисплея. Показывает клавиатуру PIN до того, как
+  открыть интерфейс. PIN выбирает режим:
+      7232 → штатный киоск оператора (main.html);
+      5656 → монитор получателя (user.html): только чтение и отсек по PIN.
+  Проверка PIN — на сервере (POST /api/gate), роль хранится в HttpOnly-cookie.
+  Страница ничего не решает сама и не содержит инженерных данных.
+-->
+<body>
+  <div class="gate">
+    <!-- 1. Кто это и что происходит -->
+    <section aria-label="О роботе">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M4 14h16M7 10h10M9 6h6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="7" cy="18" r="2.3" fill="currentColor"/>
+            <circle cx="17" cy="18" r="2.3" fill="currentColor"/>
+          </svg>
+        </span>
+        <div>
+          <b>RUS SLAM</b>
+          <small>робот-курьер 4WIS/4WID</small>
+        </div>
+      </div>
+
+      <h1>БОРТОВОЙ<br /><em>ЭКРАН</em></h1>
+      <p class="lead">
+        Введите служебный PIN. Экран сам откроет нужный режим — штатный пульт
+        оператора или панель получателя.
+      </p>
+
+      <!-- Живые, но обезличенные данные: только чтобы понять, что борт на связи -->
+      <div class="telemetry" aria-live="off">
+        <div>
+          <div class="tel-k">Связь с бортом</div>
+          <div class="tel-v"><span class="dot" id="t-link"></span><span id="t-link-v">есть</span></div>
+        </div>
+        <div>
+          <div class="tel-k">Отсек</div>
+          <div class="tel-v"><span class="dot" id="t-lock"></span><span id="t-lock-v">закрыт</span></div>
+        </div>
+        <div>
+          <div class="tel-k">АКБ</div>
+          <div class="tel-v"><span id="t-soc">—</span></div>
+        </div>
+      </div>
+
+      <div class="foot-left">борт 0001 · экран запуска</div>
+    </section>
+
+    <!-- 2. Клавиатура -->
+    <section class="pad-card" id="pad" aria-label="Ввод PIN">
+      <div class="resume" id="resume">
+        Вы уже вошли. <a id="resume-link" href="main.html">Продолжить →</a>
+      </div>
+
+      <div class="pad-top">
+        <span class="pad-title">Введите PIN</span>
+        <span class="lock-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="4" y="10" width="16" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          4 цифры
+        </span>
+      </div>
+
+      <div class="pins" id="pins" aria-label="Введено цифр: 0 из 4">
+        <span class="pin-dot"></span><span class="pin-dot"></span>
+        <span class="pin-dot"></span><span class="pin-dot"></span>
+      </div>
+
+      <div class="status" id="status" role="status" aria-live="polite">Введите код с клавиатуры или наберите на цифровых клавишах</div>
+
+      <div class="keys" id="keys">
+        <button class="key" data-key="1" type="button">1</button>
+        <button class="key" data-key="2" type="button">2</button>
+        <button class="key" data-key="3" type="button">3</button>
+        <button class="key" data-key="4" type="button">4</button>
+        <button class="key" data-key="5" type="button">5</button>
+        <button class="key" data-key="6" type="button">6</button>
+        <button class="key" data-key="7" type="button">7</button>
+        <button class="key" data-key="8" type="button">8</button>
+        <button class="key" data-key="9" type="button">9</button>
+        <button class="key util" data-key="back" type="button">Стереть</button>
+        <button class="key" data-key="0" type="button">0</button>
+        <button class="key enter" data-key="enter" type="button" aria-label="Войти">Войти</button>
+      </div>
+
+      <div class="demo">
+        <span>демо-стенд</span>
+        <span><b>7232</b> оператор · <b>5656</b> получатель</span>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var MAX = 4;
+      var pin = '';
+      var busy = false;
+      var blockedUntil = 0;
+      var statusEl = document.getElementById('status');
+      var padEl = document.getElementById('pad');
+      var pinsEl = document.getElementById('pins');
+      var dots = [].slice.call(pinsEl.children);
+      var keysEl = document.getElementById('keys');
+      var enterKey = keysEl.querySelector('[data-key="enter"]');
+      var tick = null;
+
+      function say(text, kind) {
+        statusEl.textContent = text;
+        statusEl.className = 'status' + (kind ? ' ' + kind : '');
+      }
+
+      function paint() {
+        dots.forEach(function (d, i) { d.classList.toggle('on', i < pin.length); });
+        pinsEl.setAttribute('aria-label', 'Введено цифр: ' + pin.length + ' из ' + MAX);
+        enterKey.disabled = pin.length !== MAX || busy || Date.now() < blockedUntil;
+      }
+
+      function reset() {
+        pin = '';
+        paint();
+      }
+
+      function fail(message, ms) {
+        padEl.classList.remove('shake');
+        void padEl.offsetWidth;
+        padEl.classList.add('shake');
+        say(message, 'error');
+        reset();
+        if (ms > 0) {
+          blockedUntil = Date.now() + ms;
+          countdown();
+        }
+        paint();
+      }
+
+      function countdown() {
+        if (tick) clearInterval(tick);
+        tick = setInterval(function () {
+          var left = blockedUntil - Date.now();
+          if (left <= 0) {
+            clearInterval(tick);
+            tick = null;
+            blockedUntil = 0;
+            say('Введите код с клавиатуры или наберите на цифровых клавишах');
+            paint();
+            return;
+          }
+          say('Слишком много попыток. Подождите ' + Math.ceil(left / 1000) + ' с', 'error');
+          paint();
+        }, 200);
+      }
+
+      function submit() {
+        if (busy || pin.length !== MAX) return;
+        busy = true;
+        paint();
+        say('Проверяем код…');
+        fetch('api/gate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          body: JSON.stringify({ pin: pin })
+        }).then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            return { status: r.status, body: j };
+          });
+        }).then(function (res) {
+          busy = false;
+          var j = res.body || {};
+          if (res.status === 200 && j.ok && j.redirect) {
+            say('Готово: ' + (j.role === 'operator' ? 'режим оператора' : 'панель получателя'), 'ok');
+            var dest = j.redirect;
+            try {
+              if (j.token) localStorage.setItem('rus_token', j.token);
+            } catch (err) { /* приватный режим — обойдёмся cookie */ }
+            // ?t= страхует от браузеров, где cookie во встроенном окне не доходят
+            if (j.token) dest += (dest.indexOf('?') < 0 ? '?' : '&') + 't=' + encodeURIComponent(j.token);
+            location.replace(dest);
+            return;
+          }
+          var ms = Number(j.remainingMs) || 0;
+          fail(j.error || 'Код не подошёл', ms);
+        }).catch(function () {
+          busy = false;
+          fail('Сервер борта не отвечает. Проверьте связь.', 0);
+        });
+      }
+
+      function press(key) {
+        if (Date.now() < blockedUntil && key !== 'clear') return;
+        if (key === 'back') {
+          pin = pin.slice(0, -1);
+          say('Введите код с клавиатуры или наберите на цифровых клавишах');
+        } else if (key === 'enter') {
+          submit();
+        } else if (/^\d$/.test(key)) {
+          if (pin.length < MAX) pin += key;
+          if (pin.length === MAX) {
+            say('Проверяем код…');
+            setTimeout(submit, 180);
+          } else {
+            say('Ещё ' + (MAX - pin.length) + ' цифр' + (MAX - pin.length === 1 ? 'а' : 'ы'));
+          }
+        }
+        paint();
+      }
+
+      keysEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('.key');
+        if (!btn) return;
+        press(btn.getAttribute('data-key'));
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (/^\d$/.test(e.key)) { e.preventDefault(); press(e.key); }
+        else if (e.key === 'Backspace') { e.preventDefault(); press('back'); }
+        else if (e.key === 'Enter') { e.preventDefault(); press('enter'); }
+      });
+
+      // Уже вошли? Не запираем, но и не перекидываем молча — предлагаем продолжить.
+      var savedToken = '';
+      try { savedToken = localStorage.getItem('rus_token') || ''; } catch (err) { /* нет доступа */ }
+      fetch('api/session', {
+        cache: 'no-store',
+        headers: savedToken ? { 'X-Session': savedToken } : {}
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j && j.ok && j.role) {
+            var link = document.getElementById('resume-link');
+            var home = j.home || 'main.html';
+            if (savedToken) home += (home.indexOf('?') < 0 ? '?' : '&') + 't=' + encodeURIComponent(savedToken);
+            link.href = home;
+            link.textContent = (j.role === 'operator' ? 'Продолжить как оператор' : 'Продолжить как получатель') + ' →';
+            document.getElementById('resume').classList.add('show');
+          }
+        })
+        .catch(function () {});
+
+      // Мини-сводка борта: есть ли связь, закрыт ли отсек, сколько заряда.
+      fetch('api/state', { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var d = j && j.ok ? j.data : null;
+          if (!d) throw new Error('нет данных');
+          var link = d.linkOk !== false;
+          document.getElementById('t-link').className = 'dot' + (link ? '' : ' bad');
+          document.getElementById('t-link-v').textContent = link ? 'есть' : 'нет';
+          var closed = !(d.lock && d.lock.open);
+          document.getElementById('t-lock').className = 'dot' + (closed ? '' : ' warn');
+          document.getElementById('t-lock-v').textContent = closed ? 'закрыт' : 'открыт';
+          var soc = d.battery && typeof d.battery.soc === 'number' ? Math.round(d.battery.soc) : null;
+          document.getElementById('t-soc').textContent = soc === null ? '—' : soc + ' %';
+        })
+        .catch(function () {
+          document.getElementById('t-link').className = 'dot bad';
+          document.getElementById('t-link-v').textContent = 'нет';
+          document.getElementById('t-soc').textContent = '—';
+        });
+
+      paint();
+    })();
+  </script>
+</body>
+</html>

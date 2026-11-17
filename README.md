@@ -200,6 +200,7 @@ rus_slam/
 | Бортовой экран робота (киоск) | [`MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
 | Сервисный пульт | [`SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) | [`PDF`](docs/pdf/SERVICE_CONSOLE.pdf) |
 | Запуск, доступ, учётки и PIN | [`RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md) | [`PDF`](docs/pdf/RUN_AND_ACCESS.pdf) |
+| Экран запуска по PIN и панель получателя | [`BOARD_GATE.md`](docs/BOARD_GATE.md) | [`PDF`](docs/pdf/BOARD_GATE.pdf) |
 
 `COST_ESTIMATE.md` руками не правят: его собирает
 [`tools/estimate/build_estimate.py`](tools/estimate/build_estimate.py) из таблиц
@@ -544,11 +545,10 @@ udev-правила [`99-rus-slam.rules`](ros2_ws/src/rus_slam_bringup/udev/99-r
 > [`docs/SERIAL_PROTOCOL.md`](docs/SERIAL_PROTOCOL.md).
 
 ```bash
-python3 gui/backend.py --port 8080     # /  → основной экран робота (киоск)
-                                       # /index.html, /console → инженерный пульт
+python3 gui/backend.py --port 8080     # / → экран запуска с PIN, /console → пульт
 python3 gui/backend.py --kiosk         # то же + браузер без рамок на весь дисплей
 node gui/tests/console.test.js         # 32 теста ядра сервисного пульта
-python3 gui/tests/backend.test.py      # 40 проверок бэкенда и API
+python3 gui/tests/backend.test.py      # 69 проверок бэкенда и API
 python3 gui/tests/main.screen.test.js  # 38 проверок экрана (нужен jsdom: npm i jsdom)
 python3 gui/tests/ui.audit.test.js     # 20 проверок интерфейса: нет дублей кнопок и мёртвых ссылок
 python3 gui/tests/console.api.test.js  # 17 сквозных: PIN и журнал общие с бортом
@@ -556,8 +556,16 @@ python3 gui/tests/main.api.test.js     # 19 сквозных: экран ↔ ж�
 ```
 
 Источник данных для экрана: `--source sim` (стенд), `--source serial`
-(4 USB, кадры протокола) или `--source ros` (ROS 2). Доступ к экранам
-с планшета — `http://<ip-робота>:8080/`; подробно — [`docs/RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md).
+(4 USB, кадры протокола) или `--source ros` (ROS 2).
+
+**Вход на борт по PIN.** При запуске дисплей показывает экран запуска:
+`7232` открывает штатный киоск оператора (`main.html`), `5656` — панель
+получателя (`user.html`): только связь, АКБ, груз и отсек по PIN, без настроек и
+инженерного пульта. PIN отсека — отдельный код (`2580` по умолчанию).
+Подробности, таблица прав и ограничения — [`docs/BOARD_GATE.md`](docs/BOARD_GATE.md).
+
+Доступ к экранам с планшета — `http://<ip-робота>:8080/gate.html`; подробно —
+[`docs/RUN_AND_ACCESS.md`](docs/RUN_AND_ACCESS.md).
 
 Как это выглядит — скриншоты с работающего сервера:
 

@@ -478,7 +478,12 @@
   /* ======================================================================
    * 7. Навигация: основной экран ↔ инженерный пульт
    * ==================================================================== */
-  function goConsole() { window.location.href = 'index.html'; }
+  function goConsole() {
+    // Токен входа переносим в адрес: без него пульт за шлюзом, если cookie не дошли.
+    let token = '';
+    try { token = localStorage.getItem('rus_token') || ''; } catch (err) { token = ''; }
+    window.location.href = token ? 'index.html?t=' + encodeURIComponent(token) : 'index.html';
+  }
 
   function initNav() {
     const link = $('sc-console-link');

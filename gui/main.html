@@ -49,6 +49,8 @@
         <span class="sc-dot" id="sc-link-dot"></span>
         <span id="sc-link-text">связь с бортом: есть</span>
       </div>
+      <button class="sc-user-btn" id="sc-switch-user" type="button"
+              title="Выйти на экран запуска и сменить пользователя">сменить</button>
       <div class="sc-clock" id="sc-clock">--:--:--</div>
     </div>
   </header>
@@ -127,6 +129,33 @@
        title="Служебные функции: карта SLAM, сервис двигателей, статистика">инженерный пульт →</a>
   </footer>
 
+  <script>
+    // Токен входа: из ?t= (если cookie не доходят) или из прошлого входа.
+    (function () {
+      var q = new URLSearchParams(location.search).get('t');
+      if (q) { try { localStorage.setItem('rus_token', q); } catch (e) {} }
+      var token = q;
+      if (!token) { try { token = localStorage.getItem('rus_token'); } catch (e) {} }
+      if (!token) return;
+      var native = window.fetch;
+      window.fetch = function (url, opts) {
+        opts = opts || {};
+        opts.headers = Object.assign({}, opts.headers, { 'X-Session': token });
+        return native.call(window, url, opts);
+      };
+      var link = document.getElementById('sc-console-link');
+      if (link) link.href = 'index.html?t=' + encodeURIComponent(token);
+    })();
+  </script>
   <script src="main.js"></script>
+  <script>
+    // Выход на экран запуска: сессию снимает сервер, PIN больше не действует.
+    document.getElementById('sc-switch-user').addEventListener('click', function () {
+      try { localStorage.removeItem('rus_token'); } catch (e) { /* нечего чистить */ }
+      fetch('api/logout', { method: 'POST', cache: 'no-store' })
+        .catch(function () {})
+        .then(function () { location.replace('gate.html'); });
+    });
+  </script>
 </body>
 </html>
