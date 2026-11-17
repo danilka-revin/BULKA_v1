@@ -1,15 +1,7 @@
 {
-  "acp_3mm.jpg": {
-    "url": "https://plasticsheetsshop.co.uk/aluminium-composite-panels/white",
-    "title": "ACP white aluminium composite panel (plasticsheetsshop.co.uk)"
-  },
   "battery_box.jpg": {
     "url": "https://ebay.ca/itm/173637225434",
     "title": "36V 48V Empty Ebike battery box, lithium battery case (eBay)"
-  },
-  "beacon.jpg": {
-    "url": "https://www.amazon.com/Magnetic-Rechargeable-Waterproof-Portable-Emergency/dp/B0F1MR1JSG",
-    "title": "12-24V Amber LED Strobe Light, magnetic (Amazon)"
   },
   "belt_gt2.jpg": {
     "url": "https://aliexpress.us/w/wholesale-gt2-10mm-closed-loop-timing-belt.html",
@@ -23,13 +15,13 @@
     "url": "https://www.amazon.com/DALY-Lifepo4-Battery-Protection-Electronic/dp/B0B4JWSQG5",
     "title": "DALY 12S 36V LiFePO4 BMS 60A (Amazon)"
   },
-  "buzzer.jpg": {
-    "url": "https://rs24.ru/product/2359625",
-    "title": "Оповещатель звуковой Зуммер-1-05 2ТК-12, 85 дБ, 12 В (rs24.ru)"
-  },
   "c930e.jpg": {
     "url": "https://www.walmart.com/ip/Logitech-C930e-USB-2-0-HD-Webcam-1920-x-1080-Video-with-Auto-focus-960-000971/24727514",
     "title": "Logitech C930e HD Webcam, 1080p (Walmart)"
+  },
+  "carbon_cloth.jpg": {
+    "url": "https://www.amazon.com/carbon-fiber-roll/s?k=carbon+fiber+roll",
+    "title": "Carbon fiber fabric roll, 2×2 twill 3K (Amazon)"
   },
   "carrier_sensor.jpg": {
     "repo": "pcb/images/sensor_module_render.png"
@@ -64,6 +56,10 @@
   "display_10.jpg": {
     "url": "https://www.amazon.com/Waveshare-Capacitive-1280x800-Hardware-Resolution/dp/B01M7RRBUT",
     "title": "Waveshare 10.1 inch Capacitive Touch Screen LCD, IPS, 1280x800 (Amazon)"
+  },
+  "epoxy_resin.jpg": {
+    "url": "https://www.amazon.com/Epoxy-Resin-16-Kit-Hardener/dp/B01LWT156B",
+    "title": "Epoxy resin and hardener kit, 1 gallon (Amazon)"
   },
   "estop_switch.jpg": {
     "url": "https://amazon.ca/Emergency-Mushroom-Button-Switches-Control/dp/B0FPWZNNB3",
