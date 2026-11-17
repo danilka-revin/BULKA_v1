@@ -85,6 +85,7 @@ python3 tools/estimate/build_estimate.py --rate 85  # показать итог�
 
 | Документ | Содержание | Markdown | PDF |
 | :--- | :--- | :--- | :--- |
+| 🎤 **Техническая книжка для защиты** | Сжатая выжимка для судей: визитная карточка, механика, кинематика, электроника, архитектура ПО, информационная безопасность, смета, испытания и ограничения — на 10–12 страниц | [`docs/sud_docs.md`](docs/sud_docs.md) | [`PDF`](docs/pdf/sud_docs.pdf) |
 | 📘 **Полный технический паспорт** | Инженерные расчеты прочности рамы под 250 кг, редуктора GT2 150/20, ступиц Subaru, АКБ | [`docs/TECHNICAL_SPECIFICATION.md`](docs/TECHNICAL_SPECIFICATION.md) | [`PDF`](docs/pdf/TECHNICAL_SPECIFICATION.pdf) |
 | 📑 **Пояснительная записка по регламенту** | Пояснительная записка по критериям задания № 2 (экономика, сравнение с 3 аналогами, методика тестов) | [`docs/EXPLANATORY_NOTE_AVTOVAZ.md`](docs/EXPLANATORY_NOTE_AVTOVAZ.md) | [`PDF`](docs/pdf/EXPLANATORY_NOTE_AVTOVAZ.pdf) |
 | 💰 **Смета на изготовление** | 63 позиции с фотографиями, количеством, ценой в рублях и долларах США и ссылками на продавцов; итог **384 519,91 ₽ (4 646,56 USD)** | [`docs/COST_ESTIMATE.md`](docs/COST_ESTIMATE.md) | [`PDF`](docs/pdf/COST_ESTIMATE.pdf) |
@@ -186,6 +187,7 @@ rus_slam/
 
 | Документ | Markdown | PDF |
 | :--- | :--- | :--- |
+| Техническая книжка для защиты (судьи) | [`sud_docs.md`](docs/sud_docs.md) | [`PDF`](docs/pdf/sud_docs.pdf) |
 | Технический паспорт робота | [`TECHNICAL_SPECIFICATION.md`](docs/TECHNICAL_SPECIFICATION.md) | [`PDF`](docs/pdf/TECHNICAL_SPECIFICATION.pdf) |
 | Пояснительная записка по регламенту | [`EXPLANATORY_NOTE_AVTOVAZ.md`](docs/EXPLANATORY_NOTE_AVTOVAZ.md) | [`PDF`](docs/pdf/EXPLANATORY_NOTE_AVTOVAZ.pdf) |
 | Смета на изготовление робота | [`COST_ESTIMATE.md`](docs/COST_ESTIMATE.md) | [`PDF`](docs/pdf/COST_ESTIMATE.pdf) |
