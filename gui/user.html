@@ -3,23 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RUS SLAM — панель получателя</title>
-  <meta name="theme-color" content="#0b1411" />
+  <title>BULKA_v1 — панель получателя</title>
+  <meta name="theme-color" content="#0c0c0c" />
   <style>
+    /* Оформление — как у бортового экрана и веб-пульта BULKA_v1 (ZMK Vision):
+       графитовый чёрный, нейтральные карточки, лаймовый акцент только на действиях. */
     :root {
-      --bg: #0b1411;
-      --panel: #121d18;
-      --panel-2: #16241d;
-      --line: #22332b;
-      --ink: #e8f2ec;
-      --muted: #7f958a;
+      --bg: #0c0c0c;
+      --panel: #151515;
+      --panel-2: #1d1d1d;
+      --line: #2a2a2a;
+      --line-soft: #232323;
+      --ink: #f2f2f2;
+      --muted: #9a9a9a;
+      --dim: #6c6c6c;
       --accent: #d5ff45;
-      --ok: #46e08a;
-      --warn: #ff8a5c;
-      --err: #ff5f56;
-      --radius: 20px;
-      --font: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
-      --mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --accent-ink: #141414;
+      --ok: #c8f43a;
+      --warn: #e5a438;
+      --err: #e0564a;
+      --radius: 18px;
+      --font: Inter, "Segoe UI", system-ui, Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
     * { box-sizing: border-box; }
@@ -27,71 +32,75 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: var(--font);
+      background: var(--bg);
       color: var(--ink);
-      background:
-        radial-gradient(900px 520px at 8% -10%, rgba(213, 255, 69, 0.08), transparent 60%),
-        radial-gradient(700px 500px at 100% 100%, rgba(70, 224, 138, 0.06), transparent 55%),
-        var(--bg);
+      font-family: var(--font);
       -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* ── шапка ───────────────────────────────────────────────── */
+    /* ── шапка ──────────────────────────────────────────────── */
     .head {
       position: sticky;
       top: 0;
       z-index: 20;
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 14px clamp(16px, 3vw, 34px);
-      background: rgba(11, 20, 17, 0.82);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--line);
+      gap: 14px;
+      padding: 12px clamp(14px, 2.4vw, 26px);
+      background: rgba(15, 15, 15, .94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line-soft);
     }
 
-    .mark {
-      width: 38px;
-      height: 38px;
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
-      border-radius: 12px;
       background: var(--accent);
-      color: #10200f;
+      color: var(--accent-ink);
       flex: none;
     }
 
-    .head-title b {
+    .brand b {
       display: block;
-      font-size: 14px;
-      letter-spacing: 0.16em;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      white-space: nowrap;
     }
 
-    .head-title small {
+    .brand small {
       display: block;
-      margin-top: 2px;
+      margin-top: 3px;
       font-size: 10px;
-      letter-spacing: 0.18em;
+      letter-spacing: .16em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--dim);
     }
 
     .head-right {
       margin-left: auto;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }
 
-    .chip {
+    .pill {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 7px 12px;
-      border: 1px solid var(--line);
+      gap: 8px;
+      padding: 8px 13px;
       border-radius: 999px;
-      font-size: 12px;
+      border: 1px solid var(--line);
+      background: #181818;
       color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
       white-space: nowrap;
     }
 
@@ -100,443 +109,515 @@
       height: 7px;
       border-radius: 50%;
       background: var(--ok);
-      box-shadow: 0 0 0 3px rgba(70, 224, 138, 0.12);
       flex: none;
     }
 
-    .dot.bad { background: var(--err); box-shadow: 0 0 0 3px rgba(255, 95, 86, 0.12); }
-    .dot.warn { background: var(--warn); box-shadow: 0 0 0 3px rgba(255, 138, 92, 0.12); }
+    .dot.bad { background: var(--err); }
+    .dot.warn { background: var(--warn); }
 
     .clock {
-      font-family: var(--mono);
-      font-size: 15px;
-      letter-spacing: 0.04em;
-      min-width: 74px;
+      font-size: 24px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .02em;
+      padding-left: 4px;
+      min-width: 62px;
       text-align: right;
     }
 
     .switch {
       appearance: none;
       border: 1px solid var(--line);
-      background: transparent;
+      background: #181818;
       color: var(--muted);
       border-radius: 999px;
-      padding: 8px 14px;
+      padding: 9px 14px;
       font: inherit;
-      font-size: 12px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
       cursor: pointer;
-      transition: color 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+      transition: color .15s, border-color .15s, background .15s;
     }
 
-    .switch:hover { color: var(--ink); border-color: #36503f; }
+    .switch:hover { color: var(--ink); border-color: #3a3a3a; background: #1e1e1e; }
 
-    /* ── содержимое ──────────────────────────────────────────── */
+    /* ── сетка ──────────────────────────────────────────────── */
     .wrap {
-      width: min(1120px, 100%);
+      width: min(1240px, 100%);
       margin: 0 auto;
-      padding: clamp(18px, 3vw, 34px) clamp(16px, 3vw, 34px) 40px;
+      padding: clamp(14px, 2.4vw, 26px) clamp(14px, 2.4vw, 26px) 34px;
       display: grid;
-      gap: 18px;
+      gap: 12px;
     }
 
     .offline {
       display: none;
-      padding: 12px 16px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 95, 86, 0.35);
-      background: rgba(255, 95, 86, 0.08);
-      color: #ffb4ae;
-      font-size: 13px;
+      padding: 11px 15px;
+      border-radius: 12px;
+      border: 1px solid #4a2622;
+      background: #1e1210;
+      color: #e9a49c;
+      font-size: 12.5px;
     }
 
     .offline.show { display: block; }
 
-    .grid-main {
+    .top {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 18px;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+      gap: 12px;
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), transparent 42%), var(--panel);
-      border: 1px solid var(--line);
+      background: var(--panel);
+      border: 1px solid var(--line-soft);
       border-radius: var(--radius);
-      padding: clamp(18px, 2.2vw, 26px);
+      padding: clamp(16px, 2vw, 22px);
+      min-width: 0;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
     .card-k {
-      font-size: 10px;
-      letter-spacing: 0.18em;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .16em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 14px;
     }
 
-    /* отсек */
-    .cargo {
-      position: relative;
-      overflow: hidden;
+    .card-note {
+      margin-left: auto;
+      font-size: 10.5px;
+      color: var(--dim);
+      text-align: right;
     }
 
-    .cargo::after {
-      content: "";
-      position: absolute;
-      right: -90px;
-      top: -90px;
-      width: 240px;
-      height: 240px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(213, 255, 69, 0.12), transparent 65%);
-      pointer-events: none;
-    }
-
+    /* ── отсек ──────────────────────────────────────────────── */
     .cargo-state {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
     .lock-ic {
-      width: 54px;
-      height: 54px;
-      border-radius: 16px;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
       display: grid;
       place-items: center;
       border: 1px solid var(--line);
       background: var(--panel-2);
-      color: var(--accent);
+      color: var(--muted);
       flex: none;
     }
 
-    .lock-ic.open { color: var(--warn); border-color: rgba(255, 138, 92, 0.35); }
+    .lock-ic.open { color: var(--warn); border-color: #4a3a22; background: #1f1a10; }
 
     .cargo-state h1 {
       margin: 0;
-      font-size: clamp(24px, 3vw, 34px);
-      letter-spacing: -0.01em;
-      line-height: 1.1;
+      font-size: clamp(22px, 2.6vw, 30px);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1.15;
     }
 
     .cargo-state p {
       margin: 5px 0 0;
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--muted);
     }
 
-    .cargo-facts {
+    .state-pill {
+      margin-left: auto;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      background: #222;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .state-pill.open { background: #33260f; color: var(--warn); }
+
+    .facts {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin: 0 0 22px;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .fact {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px 14px;
-      background: rgba(255, 255, 255, 0.015);
+      background: var(--panel-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 10px 13px;
     }
 
     .fact-k {
-      font-size: 10px;
-      letter-spacing: 0.12em;
+      font-size: 9.5px;
+      letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 5px;
+      color: var(--dim);
+      margin-bottom: 6px;
     }
 
     .fact-v {
-      font-family: var(--mono);
       font-size: 16px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
     }
 
     .btn {
       appearance: none;
       width: 100%;
-      min-height: 58px;
-      border-radius: 16px;
+      min-height: 54px;
+      border-radius: 13px;
       border: 1px solid var(--accent);
       background: var(--accent);
-      color: #10200f;
+      color: var(--accent-ink);
       font: inherit;
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .02em;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: transform 0.08s ease, background 0.15s ease;
+      gap: 9px;
+      transition: background .15s, transform .06s;
     }
 
-    .btn:hover { background: #e0ff70; }
-    .btn:active { transform: scale(0.99); }
-    .btn:disabled { opacity: 0.4; cursor: default; }
-    .btn.ghost {
-      background: transparent;
-      border-color: var(--line);
-      color: var(--ink);
-      font-weight: 500;
-    }
-    .btn.ghost:hover { background: rgba(255, 255, 255, 0.04); }
+    .btn:hover { background: #c8f43a; }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: .45; cursor: default; }
 
     .hint {
-      margin: 10px 0 0;
-      font-size: 12px;
-      color: var(--muted);
+      margin: 9px 0 0;
+      font-size: 11px;
+      color: var(--dim);
       text-align: center;
     }
 
-    /* АКБ */
-    .batt-pct {
+    /* ── АКБ ────────────────────────────────────────────────── */
+    .batt-top {
       display: flex;
       align-items: baseline;
       gap: 8px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
-    .batt-pct b {
-      font-size: clamp(46px, 6vw, 66px);
+    .batt-top b {
+      font-size: clamp(42px, 5vw, 58px);
+      font-weight: 700;
       line-height: 1;
-      font-weight: 650;
-      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.02em;
     }
 
-    .batt-pct span { font-size: 18px; color: var(--muted); }
+    .batt-top span { font-size: 17px; color: var(--muted); }
 
     .bar {
-      height: 10px;
+      height: 8px;
       border-radius: 99px;
-      background: #1b2a23;
+      background: #101010;
+      border: 1px solid var(--line);
       overflow: hidden;
-      margin: 16px 0 18px;
+      margin: 14px 0 16px;
     }
 
     .bar i {
       display: block;
       height: 100%;
       width: 0%;
-      border-radius: 99px;
-      background: linear-gradient(90deg, #8fcc2a, var(--accent));
-      transition: width 0.4s ease;
+      background: #e6e6e6;
+      transition: width .4s ease, background .3s;
     }
 
-    .bar.low i { background: linear-gradient(90deg, #d9663a, var(--warn)); }
+    .bar.low i { background: var(--warn); }
 
     .batt-rows {
       display: grid;
-      gap: 9px;
-      font-size: 13px;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
-    .batt-rows div {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding-bottom: 9px;
-      border-bottom: 1px solid rgba(34, 51, 43, 0.7);
+    .batt-row {
+      background: var(--panel-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 11px;
+      padding: 9px 11px;
     }
 
-    .batt-rows div:last-child { border-bottom: 0; padding-bottom: 0; }
-    .batt-rows span { color: var(--muted); }
-    .batt-rows b { font-family: var(--mono); font-weight: 500; }
+    .batt-row span {
+      display: block;
+      font-size: 9.5px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 5px;
+    }
 
-    /* полоса из четырёх мини-карточек */
+    .batt-row b {
+      font-size: 15px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* ── мини-карточки ──────────────────────────────────────── */
     .mini {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
     }
 
-    .mini .card { padding: 16px 18px; border-radius: 16px; }
+    .mini .card { padding: 14px 16px; border-radius: 14px; }
 
     .mini-k {
-      font-size: 10px;
-      letter-spacing: 0.14em;
+      font-size: 9.5px;
+      letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--dim);
       margin-bottom: 8px;
     }
 
     .mini-v {
-      font-family: var(--mono);
-      font-size: 19px;
+      font-size: 17px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .mini-v small { font-size: 12px; color: var(--muted); }
+    .mini-v small { font-size: 11px; font-weight: 500; color: var(--muted); margin-left: 2px; }
 
-    /* две нижние карточки */
-    .grid-bottom {
+    /* ── о роботе и журнал ──────────────────────────────────── */
+    .bottom {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
+      gap: 12px;
     }
 
     .about p {
-      margin: 0 0 14px;
-      font-size: 13.5px;
-      line-height: 1.55;
+      margin: 0 0 16px;
+      font-size: 12.5px;
+      line-height: 1.6;
       color: var(--muted);
     }
 
     .specs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px 18px;
-      font-size: 13px;
+      gap: 0 20px;
     }
 
-    .specs div {
+    .spec {
       display: flex;
       justify-content: space-between;
-      gap: 8px;
-      padding: 7px 0;
-      border-bottom: 1px solid rgba(34, 51, 43, 0.6);
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line-soft);
+      font-size: 12.5px;
     }
 
-    .specs span { color: var(--muted); }
-    .specs b { font-family: var(--mono); font-weight: 500; }
+    .spec span { color: var(--dim); }
+    .spec b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-    .log { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+    .log { list-style: none; margin: 0; padding: 0; }
 
     .log li {
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 9px 0;
-      border-bottom: 1px solid rgba(34, 51, 43, 0.6);
-      font-size: 13px;
+      border-bottom: 1px solid var(--line-soft);
+      font-size: 12.5px;
     }
 
     .log li:last-child { border-bottom: 0; }
-    .log time { font-family: var(--mono); font-size: 11.5px; color: var(--muted); min-width: 42px; }
+    .log time { font-family: var(--mono); font-size: 11px; color: var(--dim); min-width: 36px; }
     .log .ok { color: var(--ok); }
     .log .bad { color: var(--err); }
-    .log .muted { color: var(--muted); }
+    .log .muted { color: var(--dim); }
 
     .foot {
-      padding: 4px 4px 0;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      color: #54665c;
       display: flex;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
+      padding: 2px 2px 0;
+      font-size: 9.5px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #565656;
     }
 
-    /* ── PIN-лист ────────────────────────────────────────────── */
+    /* ── лист PIN ───────────────────────────────────────────── */
     .sheet-wrap {
       position: fixed;
       inset: 0;
       z-index: 50;
       display: grid;
       place-items: end center;
-      padding: 0;
-      background: rgba(4, 9, 7, 0.6);
-      backdrop-filter: blur(6px);
+      background: rgba(0, 0, 0, .72);
+      backdrop-filter: blur(4px);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.18s ease;
+      transition: opacity .18s;
     }
 
-    @media (min-width: 640px) { .sheet-wrap { place-items: center; padding: 24px; } }
+    @media (min-width: 640px) {
+      .sheet-wrap { place-items: center; padding: 24px; }
+    }
 
     .sheet-wrap.show { opacity: 1; pointer-events: auto; }
 
     .sheet {
-      width: min(420px, 100%);
+      width: min(410px, 100%);
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 24px 24px 0 0;
-      padding: 22px 22px max(22px, env(safe-area-inset-bottom));
-      transform: translateY(14px);
-      transition: transform 0.2s ease;
+      border-radius: 22px 22px 0 0;
+      padding: 20px 20px max(20px, env(safe-area-inset-bottom));
+      transform: translateY(12px);
+      transition: transform .18s;
       box-shadow: 0 40px 90px -30px #000;
     }
 
-    @media (min-width: 640px) { .sheet { border-radius: 24px; } }
+    @media (min-width: 640px) { .sheet { border-radius: 22px; } }
     .sheet-wrap.show .sheet { transform: translateY(0); }
 
     .sheet-head {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
 
-    .sheet-head h2 { margin: 0; font-size: 19px; }
-    .sheet-head p { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); }
+    .sheet-head h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    .sheet-head p {
+      margin: 5px 0 0;
+      font-size: 11.5px;
+      color: var(--dim);
+    }
 
     .close-x {
       margin-left: auto;
       appearance: none;
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 10px;
       border: 1px solid var(--line);
-      background: transparent;
+      background: #1a1a1a;
       color: var(--muted);
-      font-size: 18px;
+      font-size: 17px;
       line-height: 1;
       cursor: pointer;
       flex: none;
     }
 
-    .close-x:hover { color: var(--ink); }
+    .close-x:hover { color: var(--ink); background: #222; }
 
     .pins {
       display: flex;
       justify-content: center;
-      gap: 14px;
-      padding: 16px 0 8px;
+      gap: 16px;
+      padding: 14px 0 6px;
     }
 
     .pin-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 1.5px solid #35483e;
-      transition: background 0.12s ease, border-color 0.12s ease;
+      width: 15px;
+      height: 15px;
+      border-radius: 5px;
+      border: 1.5px solid #3b3b3b;
+      transition: background .12s, border-color .12s, box-shadow .12s;
     }
 
-    .pin-dot.on { background: var(--accent); border-color: var(--accent); }
+    .pin-dot.on {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(213, 255, 69, .1);
+    }
 
     .status {
-      min-height: 36px;
+      min-height: 34px;
+      margin: 8px 0 10px;
       text-align: center;
-      font-size: 12.5px;
-      line-height: 1.35;
-      color: var(--muted);
-      margin-bottom: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--dim);
     }
 
     .status.error { color: var(--err); }
     .status.ok { color: var(--accent); }
 
-    .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
     .key {
       appearance: none;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, #1a2822, #14201b);
+      border: 1px solid #2f2f2f;
+      background: #1e1e1e;
       color: var(--ink);
-      border-radius: 14px;
-      min-height: 56px;
-      font-family: var(--mono);
-      font-size: 21px;
+      border-radius: 13px;
+      min-height: 52px;
+      font-family: var(--font);
+      font-size: 20px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
       cursor: pointer;
+      transition: background .1s, transform .06s;
     }
 
-    .key:active { transform: scale(0.97); background: #23362c; }
-    .key.util { font-family: var(--font); font-size: 13px; color: var(--muted); }
-    .key.enter { background: var(--accent); border-color: var(--accent); color: #10200f; font-size: 15px; }
-    .key.enter:disabled { opacity: 0.35; }
+    .key:hover { background: #262626; }
+    .key:active { transform: translateY(1px); background: #2c2c2c; }
+    .key.util {
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .key.zero { grid-column: 2 / span 2; }
+
+    .btn-sheet {
+      appearance: none;
+      width: 100%;
+      margin-top: 9px;
+      min-height: 50px;
+      border-radius: 13px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .15s, transform .06s;
+    }
+
+    .btn-sheet:hover { background: #c8f43a; }
+    .btn-sheet:active { transform: translateY(1px); }
+    .btn-sheet:disabled { opacity: .45; cursor: default; }
 
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
@@ -544,42 +625,46 @@
       50% { transform: translateX(6px); }
       75% { transform: translateX(-3px); }
     }
-    .sheet.shake { animation: shake 0.4s ease; }
 
-    /* тост */
+    .sheet.shake { animation: shake .4s ease; }
+
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 28px;
-      transform: translate(-50%, 14px);
+      bottom: 26px;
+      transform: translate(-50%, 12px);
       z-index: 60;
-      background: var(--accent);
-      color: #10200f;
-      font-size: 14px;
+      background: #1b1e10;
+      border: 1px solid #3d4520;
+      color: #e9f0c9;
+      font-size: 13px;
       font-weight: 600;
-      padding: 12px 20px;
+      padding: 11px 18px;
       border-radius: 999px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      box-shadow: 0 16px 40px -14px rgba(213, 255, 69, 0.5);
+      transition: opacity .2s, transform .2s;
+      box-shadow: 0 16px 40px -18px #000;
     }
 
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-    @media (max-width: 860px) {
-      .grid-main, .grid-bottom { grid-template-columns: 1fr; }
+    @media (max-width: 980px) {
+      .top, .bottom { grid-template-columns: 1fr; }
       .mini { grid-template-columns: 1fr 1fr; }
-      .head .chip.clock-chip { display: none; }
+      .head .pill.clock-pill { display: none; }
     }
 
-    @media (max-width: 520px) {
-      .head { gap: 10px; padding: 12px 14px; }
-      .head-title small { display: none; }
-      .head-right { gap: 8px; }
+    @media (max-width: 620px) {
+      .head { gap: 10px; }
+      .brand { min-width: 0; }
+      .brand b { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; }
+      .brand small, .head .pill { display: none; }
       .clock { display: none; }
-      .switch { padding: 7px 11px; font-size: 11px; }
-      .cargo-facts { grid-template-columns: 1fr 1fr; }
+      .switch { padding: 8px 11px; font-size: 9.5px; flex: none; }
+      .cargo-state { flex-wrap: wrap; }
+      .state-pill { margin-left: 0; }
+      .card-note { display: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -595,21 +680,21 @@
 -->
 <body>
   <header class="head">
-    <span class="mark" aria-hidden="true">
+    <span class="logo" aria-hidden="true">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path d="M4 14h16M7 10h10M9 6h6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
         <circle cx="7" cy="18" r="2.3" fill="currentColor"/>
         <circle cx="17" cy="18" r="2.3" fill="currentColor"/>
       </svg>
     </span>
-    <div class="head-title">
-      <b>RUS SLAM</b>
-      <small>панель получателя</small>
+    <div class="brand">
+      <b>BULKA_v1 · Панель получателя</b>
+      <small>робот-курьер 4WIS/4WID</small>
     </div>
 
     <div class="head-right">
-      <span class="chip"><span class="dot" id="link-dot"></span><span id="link-text">на связи</span></span>
-      <span class="chip clock-chip"><span id="mode">автономный</span></span>
+      <span class="pill"><span class="dot" id="link-dot"></span><span id="link-text">на связи</span></span>
+      <span class="pill clock-pill" id="mode">автономный режим</span>
       <span class="clock" id="clock">--:--</span>
       <button class="switch" id="switch" type="button">Сменить пользователя</button>
     </div>
@@ -618,13 +703,17 @@
   <main class="wrap">
     <div class="offline" id="offline">Нет связи с бортом. Показаны последние полученные данные — обновите страницу позже.</div>
 
-    <!-- 1. Отсек: главное действие -->
-    <div class="grid-main">
-      <section class="card cargo" aria-labelledby="cargo-title">
-        <div class="card-k">Грузовой отсек</div>
+    <div class="top">
+      <!-- 1. Отсек: единственное действие -->
+      <section class="card" aria-labelledby="cargo-title">
+        <div class="card-head">
+          <span class="card-k">Грузовой отсек</span>
+          <span class="card-note">доступ по PIN отсека</span>
+        </div>
+
         <div class="cargo-state">
           <span class="lock-ic" id="cargo-ic" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
               <rect x="4" y="10" width="16" height="10" rx="2.5" stroke="currentColor" stroke-width="1.9"/>
               <path id="cargo-shackle" d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.9"/>
             </svg>
@@ -633,9 +722,10 @@
             <h1 id="cargo-title">Отсек закрыт</h1>
             <p id="cargo-sub">Груз зафиксирован, доступ по PIN</p>
           </div>
+          <span class="state-pill" id="cargo-pill">закрыт</span>
         </div>
 
-        <div class="cargo-facts">
+        <div class="facts">
           <div class="fact">
             <div class="fact-k">Груз</div>
             <div class="fact-v" id="cargo-kg">— кг</div>
@@ -650,54 +740,65 @@
         <p class="hint" id="cargo-hint">Понадобится PIN отсека — его выдаёт оператор</p>
       </section>
 
+      <!-- 2. АКБ -->
       <section class="card" aria-labelledby="batt-title">
-        <div class="card-k" id="batt-title">Аккумулятор</div>
-        <div class="batt-pct"><b id="soc">—</b><span>%</span></div>
+        <div class="card-head">
+          <span class="card-k" id="batt-title">Заряд АКБ</span>
+          <span class="card-note">LiFePO4 · 12S3P</span>
+        </div>
+        <div class="batt-top"><b id="soc">—</b><span>%</span></div>
         <div class="bar" id="soc-bar"><i id="soc-fill"></i></div>
         <div class="batt-rows">
-          <div><span>Напряжение</span><b id="volts">— В</b></div>
-          <div><span>Ток</span><b id="amps">— А</b></div>
-          <div><span>Запас хода</span><b id="range">— км</b></div>
+          <div class="batt-row"><span>Напряжение</span><b id="volts">— В</b></div>
+          <div class="batt-row"><span>Ток</span><b id="amps">— А</b></div>
+          <div class="batt-row"><span>Запас хода</span><b id="range">— км</b></div>
+          <div class="batt-row"><span>Тяга</span><b id="power">— кВт</b></div>
         </div>
       </section>
     </div>
 
-    <!-- 2. Общие показатели -->
+    <!-- 3. Общие показатели -->
     <div class="mini">
       <div class="card"><div class="mini-k">Скорость</div><div class="mini-v" id="speed">— <small>м/с</small></div></div>
-      <div class="card"><div class="mini-k">Маршрут</div><div class="mini-v" id="route" style="font-size:14px">—</div></div>
+      <div class="card"><div class="mini-k">Маршрут</div><div class="mini-v" id="route" style="font-size:13px">—</div></div>
       <div class="card"><div class="mini-k">В работе</div><div class="mini-v" id="uptime">—</div></div>
-      <div class="card"><div class="mini-k">Состояние</div><div class="mini-v" id="health" style="font-size:15px">—</div></div>
+      <div class="card"><div class="mini-k">Состояние</div><div class="mini-v" id="health" style="font-size:14px">—</div></div>
     </div>
 
-    <!-- 3. О роботе + журнал -->
-    <div class="grid-bottom">
+    <!-- 4. О роботе и журнал -->
+    <div class="bottom">
       <section class="card about">
-        <div class="card-k">О роботе</div>
+        <div class="card-head">
+          <span class="card-k">О роботе</span>
+          <span class="card-note">справочно</span>
+        </div>
         <p>Четырёхколёсный курьер с поворотом всех колёс: забирает груз в отсек и везёт по маршруту. Панель показывает только общее состояние — управление и настройки у оператора.</p>
         <div class="specs">
-          <div><span>Габариты</span><b>750×600×400 мм</b></div>
-          <div><span>Масса</span><b>39,5 кг</b></div>
-          <div><span>Грузоподъёмность</span><b>250 кг</b></div>
-          <div><span>Скорость</span><b>до 0,625 м/с</b></div>
-          <div><span>Привод</span><b>4 × 4, BLDC</b></div>
-          <div><span>Батарея</span><b>LiFePO4 714 Вт·ч</b></div>
+          <div class="spec"><span>Габариты</span><b>750×600×400 мм</b></div>
+          <div class="spec"><span>Масса</span><b>39,5 кг</b></div>
+          <div class="spec"><span>Грузоподъёмность</span><b>250 кг</b></div>
+          <div class="spec"><span>Скорость</span><b>до 0,625 м/с</b></div>
+          <div class="spec"><span>Привод</span><b>4 × 4, BLDC</b></div>
+          <div class="spec"><span>Батарея</span><b>714 Вт·ч</b></div>
         </div>
       </section>
 
       <section class="card">
-        <div class="card-k">Последние операции</div>
+        <div class="card-head">
+          <span class="card-k">Последние операции</span>
+          <span class="card-note">журнал борта</span>
+        </div>
         <ul class="log" id="log"><li class="muted">Пока нет событий</li></ul>
       </section>
     </div>
 
     <div class="foot">
-      <span>RUS SLAM · борт 0001</span>
-      <span>Настройки и диагностика доступны только оператору</span>
+      <span>RUS SLAM · бортовой дисплей · борт 0001</span>
+      <span>настройки и диагностика — только у оператора</span>
     </div>
   </main>
 
-  <!-- 4. Лист ввода PIN отсека -->
+  <!-- 5. Лист ввода PIN отсека -->
   <div class="sheet-wrap" id="sheet-wrap" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <div class="sheet" id="sheet">
       <div class="sheet-head">
@@ -723,9 +824,9 @@
         <button class="key" data-key="8" type="button">8</button>
         <button class="key" data-key="9" type="button">9</button>
         <button class="key util" data-key="back" type="button">Стереть</button>
-        <button class="key" data-key="0" type="button">0</button>
-        <button class="key enter" data-key="enter" type="button">Готово</button>
+        <button class="key zero" data-key="0" type="button">0</button>
       </div>
+      <button class="btn-sheet" id="sheet-enter" type="button">Готово</button>
     </div>
   </div>
 
@@ -764,7 +865,7 @@
       var pinsEl = $('pins');
       var dots = [].slice.call(pinsEl.children);
       var keysEl = $('keys');
-      var enterKey = keysEl.querySelector('[data-key="enter"]');
+      var enterKey = $('sheet-enter');
 
       // ── состояние борта ──────────────────────────────────────
       function fmtUptime(sec) {
@@ -779,12 +880,14 @@
         last = d;
         var open = !!(d.lock && d.lock.open);
         var link = d.linkOk !== false;
-        document.querySelector('.head .dot').className = 'dot' + (link ? '' : ' bad');
+        $('link-dot').className = 'dot' + (link ? '' : ' bad');
         $('link-text').textContent = link ? 'на связи' : 'нет связи';
         $('offline').classList.toggle('show', !link);
 
         $('cargo-title').textContent = open ? 'Отсек открыт' : 'Отсек закрыт';
         $('cargo-sub').textContent = open ? 'Можно забрать или положить груз' : 'Груз зафиксирован, доступ по PIN';
+        $('cargo-pill').textContent = open ? 'открыт' : 'закрыт';
+        $('cargo-pill').className = 'state-pill' + (open ? ' open' : '');
         $('cargo-ic').classList.toggle('open', open);
         $('cargo-shackle').setAttribute('d', open ? 'M8 10V7a4 4 0 0 1 8 0' : 'M8 10V7a4 4 0 0 1 8 0v3');
         $('cargo-btn').textContent = open ? 'Закрыть отсек' : 'Открыть отсек';
@@ -802,13 +905,14 @@
         $('volts').textContent = (b.volts != null ? b.volts.toFixed(1) : '—') + ' В';
         $('amps').textContent = (b.amps != null ? b.amps.toFixed(1) : '—') + ' А';
         $('range').textContent = (b.rangeKm != null ? b.rangeKm.toFixed(1) : '—') + ' км';
+        $('power').textContent = (d.powerKw != null ? d.powerKw.toFixed(2) : '—') + ' кВт';
 
         $('speed').innerHTML = (d.speedMps != null ? d.speedMps.toFixed(2) : '—') + ' <small>м/с</small>';
         $('route').textContent = d.route || '—';
         $('uptime').textContent = fmtUptime(d.uptimeSec);
         var blocked = d.lock && d.lock.blocked;
-        $('health').textContent = blocked ? 'ввод PIN заблокирован' : 'в норме';
-        $('mode').textContent = (d.mode || 'автономный').toLowerCase();
+        $('health').textContent = blocked ? 'ввод PIN закрыт' : 'в норме';
+        $('mode').textContent = (d.mode || 'автономный режим').toLowerCase();
 
         if (d.lock && d.lock.blocked && d.lock.remainingMs) {
           blockedUntil = Math.max(blockedUntil, Date.now() + d.lock.remainingMs);
@@ -821,7 +925,7 @@
           .then(function (j) { if (j && j.ok && j.data) render(j.data); })
           .catch(function () {
             $('offline').classList.add('show');
-            document.querySelector('.head .dot').className = 'dot bad';
+            $('link-dot').className = 'dot bad';
             $('link-text').textContent = 'нет связи';
           });
       }
@@ -986,6 +1090,7 @@
         var btn = e.target.closest('.key');
         if (btn) press(btn.getAttribute('data-key'));
       });
+      enterKey.addEventListener('click', function () { press('enter'); });
       document.addEventListener('keydown', function (e) {
         if (!wrap.classList.contains('show')) return;
         if (e.key === 'Escape') { closeSheet(); return; }

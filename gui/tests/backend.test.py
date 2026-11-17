@@ -186,7 +186,8 @@ class TestApi(unittest.TestCase):
         opener = urllib.request.build_opener(urllib.request.HTTPRedirectHandler)
         with opener.open(req, timeout=5) as r:
             body = r.read().decode("utf-8")
-        check("HTTP: / без сессии отдаёт экран запуска", "БОРТОВОЙ" in body and "PIN" in body, body[:80])
+        check("HTTP: / без сессии отдаёт экран запуска",
+              "Вход на борт" in body and "PIN" in body and "data-key" in body, body[:80])
 
     def test_02_state(self):
         status, body = self.get("/api/state")
@@ -293,7 +294,7 @@ class TestGate(unittest.TestCase):
     def test_02_gate_page(self):
         status, _, _, body = self.call("GET", "/gate.html")
         check("шлюз: страница с PIN-клавиатурой отдаётся",
-              status == 200 and "БОРТОВОЙ" in body and "data-key" in body, status)
+              status == 200 and "Вход на борт" in body and "data-key" in body, status)
 
     def test_03_gate_wrong(self):
         status, _, _, body = self.login("1111")
