@@ -102,6 +102,7 @@ python3 tools/estimate/build_estimate.py --rate 85  # показать итог�
 | 🖥 **GUI — веб-пульт и интерфейсы** | Три интерфейса BULKA_v1 с настоящими скриншотами: пульт 8080 (телеметрия, лидар 360°, камеры), 12 страниц (устройства, датчики, АКБ, руление, карта, скан, навигация, доставка), инженерный пульт `/console` | [`docs/GUI.md`](docs/GUI.md) · [`gui/README.md`](gui/README.md) | [`PDF`](docs/pdf/GUI.pdf) |
 | 📟 **Бортовой экран робота (киоск)** | Экран 8090 в разрешении дисплея 1920 × 1080: АКБ, шасси, обзор датчиков; свайпы «тяга и руление» и «камеры и логи»; панель «Функции»; PIN только для отсека; справочный нативный экран Tkinter | [`docs/MAIN_SCREEN.md`](docs/MAIN_SCREEN.md) · [`gui/native_display.py`](gui/native_display.py) | [`PDF`](docs/pdf/MAIN_SCREEN.pdf) |
 | 🔐 **Сервисный пульт (окно «Сервис»)** | Вкладка «Сервис» инженерного пульта: ячейка хранения по PIN/QR/RFID с аудитом, ручная подача команд двигателю, АКБ 12S3P, статистика рейсов; режим симуляции и расхождение с текстовым протоколом fw26 | [`docs/SERVICE_CONSOLE.md`](docs/SERVICE_CONSOLE.md) · [`gui/console-core.js`](gui/console-core.js) | [`PDF`](docs/pdf/SERVICE_CONSOLE.pdf) |
+| 📝 **Заявка проекта (тексты для формы)** | Готовые формулировки для заявки: краткое описание, функции, отличительные особенности, ссылки на постер и облачный архив материалов | [`APPLICATION_FORM.md`](APPLICATION_FORM.md) | — |
 
 ### Тесты прошивки без железа
 
@@ -221,6 +222,7 @@ rus_slam/
 [`scooter_hub_motor.jpg`](docs/assets/images/scooter_hub_motor.jpg),
 [`subaru_hub_bearing.jpg`](docs/assets/images/subaru_hub_bearing.jpg),
 [`swerve_drive_chassis.png`](docs/assets/images/swerve_drive_chassis.png),
+[`project_card.png`](docs/assets/images/project_card.png) (визитка проекта для заявки),
 [`system_architecture.svg`](docs/assets/images/system_architecture.svg),
 [`tb6600_driver.jpg`](docs/assets/images/tb6600_driver.jpg),
 [`ui_topology.svg`](docs/assets/images/ui_topology.svg) (пульт, киоск и оборудование),
